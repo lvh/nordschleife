@@ -12,7 +12,7 @@
 (def scale-down
   "A generator for scale down events.")
 
-(def server-failure
+(def server-failures
   "A generator for server failures."
   (gen/tuple (gen/return :server-failures)
              (weighted-consts [[10 1] [2 2] [1 3]])))
@@ -27,4 +27,4 @@
                   [6 (gen/return :scale-down)]
                   [1 (gen/return :scale-down-%)]
 
-                  [6 server-failure]]))
+                  [6 server-failures]]))
