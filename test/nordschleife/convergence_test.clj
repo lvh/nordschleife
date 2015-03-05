@@ -43,3 +43,15 @@
           desired-state {:capacity 1}]
       (is (= (measure-progress prev-state curr-state desired-state)
              {:progress? true :amount 1}))))
+  (testing "When overshooting the desired capacity (group was below desired, and is now above desired), no progress was made."
+    (let [prev-state {:servers (create-servers 4)}
+          curr-state {:servers (create-servers 6)}
+          desired-state {:capacity 5}]
+      (is (= (measure-progress prev-state curr-state desired-state)
+             {:progress? false :reason "overshoot"}))))
+  (testing "When undershooting the desired capacity (group was above desired, and is now below desired), no progress was made."
+    (let [prev-state {:servers (create-servers 6)}
+          curr-state {:servers (create-servers 4)}
+          desired-state {:capacity 5}]
+      (is (= (measure-progress prev-state curr-state desired-state)
+             {:progress? false :reason "undershoot"})))))
