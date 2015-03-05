@@ -1,4 +1,5 @@
 (ns nordschleife.scenarios
+  "Tools for generating testing scenarios."
   (:require [clojure.test.check :as tc]
             [clojure.test.check.generators :as gen]
             [com.gfredericks.test.chuck.generators :as gen']))
