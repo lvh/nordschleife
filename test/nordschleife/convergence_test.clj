@@ -4,13 +4,13 @@
   (:import [org.jclouds.compute.domain.internal NodeMetadataImpl]))
 
 (def PENDING
-  (status PENDING))
+  (status-const PENDING))
 
 (def RUNNING
-  (status RUNNING))
+  (status-const RUNNING))
 
 (def ERROR
-  (status ERROR))
+  (status-const ERROR))
 
 (defn ^:private create-servers
   "Creates some dummy servers for testing."

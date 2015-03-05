@@ -2,7 +2,7 @@
   (:import [org.jclouds.compute.domain.internal NodeMetadataImpl]
            [org.jclouds.compute.domain NodeMetadata]))
 
-(defmacro status
+(defmacro status-const
   [status]
   `(. org.jclouds.compute.domain.NodeMetadata$Status ~status))
 
