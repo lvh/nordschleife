@@ -1,7 +1,6 @@
 (ns nordschleife.scenarios
   (:require [clojure.test.check :as tc]
             [clojure.test.check.generators :as gen]
-            [medley.core :refer [map-vals]]))
 
 (defn weighted-consts
   [weights-and-consts]
