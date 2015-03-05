@@ -69,4 +69,4 @@
           curr-state {:servers (conj working-servers (create-servers 2 ERROR))}
           desired-state {:capacity 5}]
       (is (= (measure-progress prev-state curr-state desired-state)
-             {:progress false})))))
+             {:progress? false}))))
