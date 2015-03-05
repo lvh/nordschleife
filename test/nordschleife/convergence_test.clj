@@ -14,21 +14,29 @@
 
 (defn ^:private create-servers
   "Creates some dummy servers for testing."
-  [n status]
-  (for [i (range n)]
-    :let [provider-id "nordschleife"
-          name (str i)
-          id (str i)
-          location nil
-          uri nil
-          user-metadata nil
-          tags nil
-          group nil
-          hardware nil
-          image-id nil
-          os nil
-          backend-status nil]
-    (NodeMetadataImpl. provider-id name id location uri user-metadata tags group hardware image-id os status backend-status nil nil nil nil nil)))
+  ([n]
+   (create-servers n RUNNING))
+  ([n status]
+   (for [i (range n)
+         :let [name (str "nordschleife-" i)
+               provider-id "nordschleife"
+               name name
+               id (str i)
+               location nil
+               uri nil
+               user-metadata {}
+               tags #{}
+               group nil
+               hardware nil
+               image-id nil
+               os nil
+               backend-status nil
+               login-port 1234
+               public-addrs ["1.2.3.4"]
+               private-addrs ["10.11.12.13"]
+               credentials nil
+               hostname name]]
+     (NodeMetadataImpl. provider-id name id location uri user-metadata tags group hardware image-id os status backend-status login-port public-addrs private-addrs credentials hostname))))
 
 (deftest measure-progress-tests
   (testing "If the capacity moves closer to the desired when scaling up, progress has been made."
