@@ -1,6 +1,7 @@
 (ns nordschleife.scenarios
   (:require [clojure.test.check :as tc]
             [clojure.test.check.generators :as gen]
+            [com.gfredericks.test.chuck.generators :as gen']))
 
 (defn ^:private weighted-consts
   [weights-and-consts]
