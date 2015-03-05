@@ -1,12 +1,7 @@
 (ns nordschleife.gathering
-  "Gather information about the state of the cloud."
-  (:require [environ.core :refer [env]]
-            [com.palletops.jclouds.compute2 :refer :all]))
+  "Gather information about the state of the cloud.")
 
-(defonce compute
-  (apply compute-service (map env [:nordschleife-provider
-                                   :nordschleife-username
-                                   :nordschleife-api-key])))
+
 
 (defn ^:private gather-servers
   "Gather all available servers."
