@@ -31,7 +31,7 @@
     (NodeMetadataImpl. provider-id name id location uri user-metadata tags group hardware image-id os status backend-status nil nil nil nil nil)))
 
 (deftest measure-progress-tests
-  (testing "If the capacity moves closer to the desired, progress has been made."
+  (testing "If the capacity moves closer to the desired when scaling up, progress has been made."
     (let [prev-state {:servers (create-servers 2)}
           curr-state {:servers (create-servers 3)}
           desired-state {:capacity 5}]
