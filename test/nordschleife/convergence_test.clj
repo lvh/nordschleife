@@ -76,4 +76,11 @@
                                      (create-servers 1 ERROR))}
           desired-state {:capacity 5}]
       (is (= (measure-progress prev-state curr-state desired-state)
+             {:progress? false}))))
+  (testing "Errored servers are removed; no progress is made."
+    (let [prev-state {:servers (conj (create-servers 1 RUNNING)
+                                     (create-servers 3 ERROR))}
+          curr-state {:servers (create-servers 1 RUNNING)}
+          desired-state {:capacity 5}]
+      (is (= (measure-progress prev-state curr-state desired-state)
              {:progress? false})))))
