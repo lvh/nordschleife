@@ -10,8 +10,10 @@
                  [com.palletops/pallet "0.8.0-RC.11"]
                  [com.palletops/pallet-jclouds "1.7.3"]
                  [com.palletops/clj-jclouds "0.1.1"]
-                 [org.apache.jclouds/jclouds-allcompute "1.8.1"]
-                 [environ "1.0.0"]]
+                 [org.apache.jclouds/jclouds-allcompute "1.7.3"]
+                 [org.apache.jclouds.labs/rackspace-autoscale-us "1.7.3"]
+                 [environ "1.0.0"]
+                 [org.clojure/core.async "0.1.346.0-17112a-alpha"]]
   :main ^:skip-aot nordschleife.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}})
