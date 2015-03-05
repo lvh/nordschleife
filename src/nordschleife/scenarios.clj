@@ -2,7 +2,7 @@
   (:require [clojure.test.check :as tc]
             [clojure.test.check.generators :as gen]
 
-(defn weighted-consts
+(defn ^:private weighted-consts
   [weights-and-consts]
   (gen/frequency
    (for [[freq const] (seq weights-and-consts)]
