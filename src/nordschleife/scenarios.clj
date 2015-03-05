@@ -9,22 +9,17 @@
    (for [[freq const] (seq weights-and-consts)]
      [freq (gen/return const)])))
 
-(def scale-down
-  "A generator for scale down events.")
-
-(def server-failures
-  "A generator for server failures."
-  (gen/tuple (gen/return :server-failures)
-             (weighted-consts [[10 1] [2 2] [1 3]])))
+(def events-with-amounts
+  (for [[weight t amount-weights] [[6 :scale-up [[10 1]]]
+                                   [1 :scale-up-% [[10 2]]]
+                                   [6 :scale-down [[10 3]]]
+                                   [1 :scale-down-% [[10 4]]]
+                                   [6 :server-failures [[10 1] [2 2] [1 3]]]]]
+    [weight
+     (gen'/for [n (weighted-consts amount-weights)]
+       {:type t :amount n})]))
 
 (def event-gen
   "A generator for scenario events."
-  (gen/frequency [[10 (gen/return :acquiesce)]
-
-                  [6 (gen/return :scale-up)]
-                  [1 (gen/return :scale-up-%)]
-
-                  [6 (gen/return :scale-down)]
-                  [1 (gen/return :scale-down-%)]
-
-                  [6 server-failures]]))
+  (gen/frequency (into [[10 (gen/return {:type :acquiesce})]]
+                       events-with-amounts)))
