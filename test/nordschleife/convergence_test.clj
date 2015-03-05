@@ -62,4 +62,11 @@
           curr-state {:servers (create-servers 4)}
           desired-state {:capacity 5}]
       (is (= (measure-progress prev-state curr-state desired-state)
-             {:progress? false :reason "undershoot"})))))
+             {:progress? false :reason "undershoot"}))))
+  (testing "When some servers go from being pending to being errored, no progress was made."
+    (let [working-servers (create-servers 2)
+          prev-state {:servers (conj working-servers (create-servers 2 PENDING))}
+          curr-state {:servers (conj working-servers (create-servers 2 ERROR))}
+          desired-state {:capacity 5}]
+      (is (= (measure-progress prev-state curr-state desired-state)
+             {:progress false})))))
