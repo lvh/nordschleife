@@ -27,4 +27,4 @@
                   [6 (gen/return :scale-down)]
                   [1 (gen/return :scale-down-%)]
 
-                  [6 server-failure-gen]]))
+                  [6 server-failure]]))
