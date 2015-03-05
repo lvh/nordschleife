@@ -36,4 +36,10 @@
           curr-state {:servers (create-servers 3)}
           desired-state {:capacity 5}]
       (is (= (measure-progress prev-state curr-state desired-state)
-             1)))))
+             1))))
+  (testing "If the capacity moves closer the desired when scaling down, progress has been made."
+    (let [prev-state {:servers (create-servers 3)}
+          curr-state {:servers (create-servers 2)}
+          desired-state {:capacity 1}]
+      (is (= (measure-progress prev-state curr-state desired-state)
+             1))))
