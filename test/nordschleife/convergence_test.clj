@@ -70,3 +70,10 @@
           desired-state {:capacity 5}]
       (is (= (measure-progress prev-state curr-state desired-state)
              {:progress? false}))))
+  (testing "When some servers go from build to error, no progress was made. That works correctly even if some of the errored machines get reaped in the mean while."
+    (let [prev-state {:servers (create-servers 3 PENDING)}
+          curr-state {:servers (conj (create-servers 1 RUNNING)
+                                     (create-servers 1 ERROR))}
+          desired-state {:capacity 5}]
+      (is (= (measure-progress prev-state curr-state desired-state)
+             {:progress? false})))))
