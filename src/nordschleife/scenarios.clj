@@ -24,3 +24,7 @@
   "A generator for scenario events."
   (gen/frequency (into [[10 (gen/return {:type :acquiesce})]]
                        events-with-amounts)))
+
+(def scenario-gen
+  "A generator for scenarios."
+  (gen/vector event-gen 4 10))
