@@ -11,10 +11,10 @@
      [freq (gen/return const)])))
 
 (def events-with-amounts
-  (for [[weight t amount-weights] [[6 :scale-up [[10 1]]]
-                                   [1 :scale-up-% [[10 2]]]
-                                   [6 :scale-down [[10 3]]]
-                                   [1 :scale-down-% [[10 4]]]
+  (for [[weight t amount-weights] [[6 :scale-up [[10 1] [2 2] [1 3]]]
+                                   [1 :scale-up-% [[10 5] [2 10]]]
+                                   [6 :scale-down [[10 1] [2 2] [1 3]]]
+                                   [1 :scale-down-% [[10 5] [2 10]]]
                                    [6 :server-failures [[10 1] [2 2] [1 3]]]]]
     [weight
      (gen'/for [n (weighted-consts amount-weights)]
