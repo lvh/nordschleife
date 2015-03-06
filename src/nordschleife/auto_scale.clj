@@ -41,6 +41,11 @@
         as-str (join (cons (first parts) tail))]
     (symbol as-str)))
 
+(defn sym-to-kw
+  [sym]
+  (let [parts (re-seq #"[a-z]+(?=[A-Z]|$)|[A-Z][a-z]*" (name sym))]
+    (keyword (join "-" (map lower-case parts)))))
+
 (defmacro builder-helper
   [builder keys map]
   (let [method-forms (for [k keys
