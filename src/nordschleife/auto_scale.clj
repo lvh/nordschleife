@@ -16,3 +16,15 @@
         (overrides (reduce #(do (.put %1 (name (first %2)) (second %2)) %1)
                            (Properties.) (dissoc opts :extensions)))
         (buildApi AutoscaleApi))))
+
+(defn group-api
+  [#^AutoscaleApi auto-scale-api #^String zone]
+  (.getGroupApiForZone auto-scale-api zone))
+
+(defn policy-api
+  [#^AutoscaleApi auto-scale-api #^String zone #^String group-id]
+  (.getPolicyApiForZoneAndGroup auto-scale-api zone group-id))
+
+(defn webhook-api
+  [#^AutoscaleApi auto-scale-api #^String zone #^String group-id]
+  (.getPolicyApiForZoneAndGroup auto-scale-api zone group-id))
