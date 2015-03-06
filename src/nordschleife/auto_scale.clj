@@ -49,6 +49,13 @@
   (let [parts (re-seq #"[a-z]+(?=[A-Z]|$)|[A-Z][a-z]*" (name sym))]
     (keyword (join "-" (map lower-case parts)))))
 
+(defn method-names
+  [obj]
+  (->> (reflect obj)
+       :members
+       (filter :return-type)
+       (map :name)))
+
 (defmacro builder-helper
   [builder keys map]
   (let [method-forms (for [k keys
