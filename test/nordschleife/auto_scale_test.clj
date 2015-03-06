@@ -1,7 +1,7 @@
 (ns nordschleife.auto-scale-test
   (:require [nordschleife.auto-scale :refer :all]
             [clojure.test :refer :all])
-  (:import [org.jclouds.rackspace.autoscale.v1.domain GroupConfiguration]))
+  (:import [org.jclouds.rackspace.autoscale.v1.domain GroupConfiguration LaunchConfiguration]))
 
 (deftest group-config-tests
   (testing "GroupConfiguration gets passed through verbatim"
@@ -28,6 +28,21 @@
                        (metadata {"xyzzy" "iddqd"})
                        (build))]
       (is (= from-map expected)))))
+
+(deftest launch-config-tests
+  (testing "LaunchConfiguration gets passed through verbatim"
+    (let [in (.. (LaunchConfiguration/builder)
+                 (loadBalancers [])
+                 (networks [])
+                 (personalities [])
+                 (serverDiskConfig "test disk config")
+                 (serverFlavorRef "test flavor")
+                 (serverImageRef "test image")
+                 (serverMetadata {"test" "metadata"})
+                 (serverName "testy mctest")
+                 (build))
+          out (launch-config in)]
+      (is (identical? in out)))))
 
 (deftest kw-to-sym-tests
   (are [kw expected] (= (kw-to-sym kw) expected)
