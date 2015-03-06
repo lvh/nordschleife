@@ -29,3 +29,23 @@
 (defn webhook-api
   [#^AutoscaleApi auto-scale-api #^String zone #^String group-id]
   (.getPolicyApiForZoneAndGroup auto-scale-api zone group-id))
+
+(defn create
+  "Create a scaling group."
+  []
+  )
+
+(defn group-config
+  "Creates a group configuration.
+
+  Accepts both `GroupConfiguration` objects and maps."
+  [gc]
+  (if (instance? GroupConfiguration gc)
+    gc
+    (.. (GroupConfiguration/builder)
+        (name (:name gc))
+        (cooldown (:cooldown gc))
+        (minEntities (:min-entities gc))
+        (maxEntities (:max-entities gc))
+        (metadata (:metadata gc))
+        (build))))
