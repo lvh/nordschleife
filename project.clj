@@ -15,6 +15,7 @@
                  [environ "1.0.0"]
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]
                  [com.taoensso/timbre "3.4.0"]]
+  :plugins [[lein-cljfmt "0.1.10"]]
   :main ^:skip-aot nordschleife.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}})
