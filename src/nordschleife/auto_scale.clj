@@ -57,14 +57,17 @@
        (map :name)))
 
 (defmacro builder-helper
-  [builder keys map]
-  (let [method-forms (for [k keys
-                           :let [m (kw-to-sym k)]]
+  [builder-expr map]
+  (let [builder (eval builder-expr)
+        method-names (remove (partial = 'build)
+                             (method-names builder))
+        method-forms (for [m method-names
+                           :let [k (sym-to-kw m)]]
                        `((fn [builder#]
                            (if-let [v# (~k ~map)]
                              (. builder# ~m v#)
                              builder#))))]
-    `(->> (~builder)
+    `(->> ~builder-expr
           ~@method-forms
           (.build))))
 
@@ -75,7 +78,4 @@
   [gc]
   (if (instance? GroupConfiguration gc)
     gc
-    (builder-helper GroupConfiguration/builder
-                    [:name :cooldown :min-entities :max-entities :metadata]
-                    gc)))
-        (build))))
+    (builder-helper (GroupConfiguration/builder) gc)))
