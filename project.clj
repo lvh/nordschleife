@@ -13,7 +13,8 @@
                  [org.apache.jclouds/jclouds-allcompute "1.7.3"]
                  [org.apache.jclouds.labs/rackspace-autoscale-us "1.7.3"]
                  [environ "1.0.0"]
-                 [org.clojure/core.async "0.1.346.0-17112a-alpha"]]
+                 [org.clojure/core.async "0.1.346.0-17112a-alpha"]
+                 [com.taoensso/timbre "3.4.0"]]
   :main ^:skip-aot nordschleife.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}})
