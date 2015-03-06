@@ -49,3 +49,9 @@
         (maxEntities (:max-entities gc))
         (metadata (:metadata gc))
         (build))))
+(defn kw-to-sym
+  [kw]
+  (let [parts (split (name kw) #"-")
+        tail (map capitalize (rest parts))
+        as-str (join (cons (first parts) tail))]
+    (symbol as-str)))
