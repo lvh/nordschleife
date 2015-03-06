@@ -28,3 +28,9 @@
                        (metadata {"xyzzy" "iddqd"})
                        (build))]
       (is (= from-map expected)))))
+
+(deftest kw-to-sym-tests
+  (are [kw expected] (= (kw-to-sym kw) expected)
+       :a 'a
+       :a-b 'aB
+       :a-bc-de 'aBcDe))
