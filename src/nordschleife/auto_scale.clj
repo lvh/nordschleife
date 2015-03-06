@@ -1,9 +1,12 @@
 (ns nordschleife.auto-scale
-  (:require [com.palletops.jclouds.core :refer [define-accessors dashed make-option-map module-lookup modules]])
+  (:require [com.palletops.jclouds.core :refer [define-accessors dashed make-option-map module-lookup modules]]
+            [clojure.string :refer [capitalize lower-case join split]]
+            [clojure.reflect :refer [reflect]]
+            [taoensso.timbre :refer [spy]])
   (:import [java.util Properties]
            [org.jclouds ContextBuilder]
            [org.jclouds.rackspace.autoscale.v1 AutoscaleApi]
-           [org.jclouds.rackspace.autoscale.v1.domain GroupConfiguration]))
+           [org.jclouds.rackspace.autoscale.v1.domain GroupConfiguration LaunchConfiguration]))
 
 (defn auto-scale-api
   [#^String username #^String api-key & options]
