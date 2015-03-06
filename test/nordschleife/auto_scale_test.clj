@@ -34,3 +34,9 @@
        :a 'a
        :a-b 'aB
        :a-bc-de 'aBcDe))
+
+(deftest sym-to-kw-tests
+  (are [sym expected] (= sym-to-kw sym) expected
+       'a :a
+       'someMethod :some-method
+       'someOtherMethod :some-other-method))

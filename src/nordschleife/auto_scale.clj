@@ -34,6 +34,24 @@
   "Create a scaling group."
   []
   )
+(defn kw-to-sym
+  [kw]
+  (let [parts (split (name kw) #"-")
+        tail (map capitalize (rest parts))
+        as-str (join (cons (first parts) tail))]
+    (symbol as-str)))
+
+(defmacro builder-helper
+  [builder keys map]
+  (let [method-forms (for [k keys
+                           :let [m (kw-to-sym k)]]
+                       `((fn [builder#]
+                           (if-let [v# (~k ~map)]
+                             (. builder# ~m v#)
+                             builder#))))]
+    `(->> (~builder)
+          ~@method-forms
+          (.build))))
 
 (defn group-config
   "Creates a group configuration.
@@ -42,16 +60,7 @@
   [gc]
   (if (instance? GroupConfiguration gc)
     gc
-    (.. (GroupConfiguration/builder)
-        (name (:name gc))
-        (cooldown (:cooldown gc))
-        (minEntities (:min-entities gc))
-        (maxEntities (:max-entities gc))
-        (metadata (:metadata gc))
+    (builder-helper GroupConfiguration/builder
+                    [:name :cooldown :min-entities :max-entities :metadata]
+                    gc)))
         (build))))
-(defn kw-to-sym
-  [kw]
-  (let [parts (split (name kw) #"-")
-        tail (map capitalize (rest parts))
-        as-str (join (cons (first parts) tail))]
-    (symbol as-str)))
