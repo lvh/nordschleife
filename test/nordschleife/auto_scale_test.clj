@@ -24,20 +24,22 @@
                                   :metadata {"xyzzy" "iddqd"}})]
       (is (= from-map test-group-config)))))
 
+(def test-launch-config
+  (.. (LaunchConfiguration/builder)
+      (loadBalancers [])
+      (networks [])
+      (personalities [])
+      (serverDiskConfig "test disk config")
+      (serverFlavorRef "test flavor")
+      (serverImageRef "test image")
+      (serverMetadata {"test" "metadata"})
+      (serverName "testy mctest")
+      (build)))
+
 (deftest launch-config-tests
   (testing "LaunchConfiguration gets passed through verbatim"
-    (let [in (.. (LaunchConfiguration/builder)
-                 (loadBalancers [])
-                 (networks [])
-                 (personalities [])
-                 (serverDiskConfig "test disk config")
-                 (serverFlavorRef "test flavor")
-                 (serverImageRef "test image")
-                 (serverMetadata {"test" "metadata"})
-                 (serverName "testy mctest")
-                 (build))
-          out (launch-config in)]
-      (is (identical? in out)))))
+    (is (identical? test-launch-config
+                    (launch-config test-launch-config)))))
 
 (deftest kw-to-sym-tests
   (are [kw expected] (= (kw-to-sym kw) expected)
