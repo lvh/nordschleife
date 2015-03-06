@@ -2,7 +2,8 @@
   (:require [com.palletops.jclouds.core :refer [define-accessors dashed make-option-map module-lookup modules]])
   (:import [java.util Properties]
            [org.jclouds ContextBuilder]
-           [org.jclouds.rackspace.autoscale.v1 AutoscaleApi]))
+           [org.jclouds.rackspace.autoscale.v1 AutoscaleApi]
+           [org.jclouds.rackspace.autoscale.v1.domain GroupConfiguration]))
 
 (defn auto-scale-api
   [#^String username #^String api-key & options]
