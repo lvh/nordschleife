@@ -3,31 +3,26 @@
             [clojure.test :refer :all])
   (:import [org.jclouds.rackspace.autoscale.v1.domain GroupConfiguration LaunchConfiguration]))
 
+(def test-group-config
+  (.. (GroupConfiguration/builder)
+      (name "my group")
+      (cooldown 10)
+      (minEntities 0)
+      (maxEntities 10)
+      (metadata {"xyzzy" "iddqd"})
+      (build)))
+
 (deftest group-config-tests
   (testing "GroupConfiguration gets passed through verbatim"
-    (let [in (.. (GroupConfiguration/builder)
-                 (name "my group")
-                 (cooldown 10)
-                 (minEntities 0)
-                 (maxEntities 10)
-                 (metadata {"xyzzy" "iddqd"})
-                 (build))
-          out (group-config in)]
-      (is (identical? in out))))
+    (is (identical? test-group-config
+                    (group-config test-group-config))))
   (testing "Maps get converted to GroupConfigurations"
     (let [from-map (group-config {:name "my group"
                                   :cooldown 10
                                   :min-entities 0
                                   :max-entities 10
-                                  :metadata {"xyzzy" "iddqd"}})
-          expected (.. (GroupConfiguration/builder)
-                       (name "my group")
-                       (cooldown 10)
-                       (minEntities 0)
-                       (maxEntities 10)
-                       (metadata {"xyzzy" "iddqd"})
-                       (build))]
-      (is (= from-map expected)))))
+                                  :metadata {"xyzzy" "iddqd"}})]
+      (is (= from-map test-group-config)))))
 
 (deftest launch-config-tests
   (testing "LaunchConfiguration gets passed through verbatim"
