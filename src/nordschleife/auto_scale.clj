@@ -56,7 +56,7 @@
        (filter :return-type)
        (map :name)))
 
-(defmacro builder-helper
+(defmacro ^:private builder-helper
   [builder-expr map]
   (let [builder (eval builder-expr)
         method-names (remove (partial = 'build)
