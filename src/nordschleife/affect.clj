@@ -5,8 +5,7 @@
 
 (defmethod affect :acquiesce
   [{compute :compute} _]
-  (loop []
-    ))
+  (loop []))
 
 (defmethod affect :scale-up
   [{auto-scale :auto-scale} {amount :amount}])
