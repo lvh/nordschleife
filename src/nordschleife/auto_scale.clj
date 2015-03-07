@@ -6,7 +6,7 @@
   (:import [java.util Properties]
            [org.jclouds ContextBuilder]
            [org.jclouds.rackspace.autoscale.v1 AutoscaleApi]
-           [org.jclouds.rackspace.autoscale.v1.domain GroupConfiguration LaunchConfiguration]))
+           [org.jclouds.rackspace.autoscale.v1.domain GroupConfiguration LaunchConfiguration CreateScalingPolicy CreateScalingPolicy$ScalingPolicyType  CreateScalingPolicy$ScalingPolicyTargetType]))
 
 (defn auto-scale-api
   [#^String username #^String api-key & options]
@@ -90,3 +90,29 @@
   Accepts both `LaunchConfiguration` objects and maps."
   [lc]
   (pojo-wrapper LaunchConfiguration lc))
+
+(def DESIRED_CAPACITY
+  CreateScalingPolicy$ScalingPolicyTargetType/DESIRED_CAPACITY)
+
+(def INCREMENTAL
+  CreateScalingPolicy$ScalingPolicyTargetType/INCREMENTAL)
+
+(def PERCENT_CHANGE
+  CreateScalingPolicy$ScalingPolicyTargetType/PERCENT_CHANGE)
+
+(def SCHEDULE
+  CreateScalingPolicy$ScalingPolicyType/SCHEDULE)
+
+(def WEBHOOK
+  CreateScalingPolicy$ScalingPolicyType/WEBHOOK)
+
+(defn scaling-policy
+  "Creates a scaling policy.
+
+  Accepts both `CreateScalingPolicy` objects and maps.
+
+  jClouds uses `CreateScalingPolicy` for scaling policies being
+  created; `ScalingPolicy is essentailly the same thing, except with
+  added id and links.`"
+  [sp]
+  (pojo-wrapper CreateScalingPolicy sp))
