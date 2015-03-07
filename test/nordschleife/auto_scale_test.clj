@@ -1,7 +1,7 @@
 (ns nordschleife.auto-scale-test
   (:require [nordschleife.auto-scale :refer :all]
             [clojure.test :refer :all])
-  (:import [org.jclouds.rackspace.autoscale.v1.domain GroupConfiguration LaunchConfiguration]))
+  (:import [org.jclouds.rackspace.autoscale.v1.domain GroupConfiguration LaunchConfiguration CreateScalingPolicy]))
 
 (def test-group-config
   (.. (GroupConfiguration/builder)
@@ -50,6 +50,24 @@
                                    :server-metadata {"test" "metadata"}
                                    :server-name "testy mctest"})]
       (is (= from-map test-launch-config)))))
+
+(def test-scaling-policy
+  (.. (CreateScalingPolicy/builder)
+      (cooldown 30)
+      (name "xyzzy")
+      (target "-5.3")
+      (targetType PERCENT_CHANGE)
+      (build)))
+
+(deftest scaling-policy-tests
+  (testing "ScalingPolicies get passed through verbatim"
+    (is (identical? test-scaling-policy (scaling-policy test-scaling-policy))))
+  (testing "Maps get converted to ScalingPolicies"
+    (let [from-map (scaling-policy {:cooldown 30
+                                    :name "xyzzy"
+                                    :target "-5.3"
+                                    :target-type PERCENT_CHANGE})]
+      (is (= from-map test-scaling-policy)))))
 
 (deftest kw-to-sym-tests
   (are [kw expected] (= (kw-to-sym kw) expected)
