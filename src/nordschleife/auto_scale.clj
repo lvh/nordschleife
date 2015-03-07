@@ -79,3 +79,12 @@
   (if (instance? GroupConfiguration gc)
     gc
     (builder-helper (GroupConfiguration/builder) gc)))
+
+(defn launch-config
+  "Creates a launch configuration.
+
+  Accepts both `LaunchConfiguration` objects and maps."
+  [lc]
+  (if (instance? LaunchConfiguration lc)
+    lc
+    (builder-helper (LaunchConfiguration/builder) lc)))
