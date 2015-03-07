@@ -39,7 +39,17 @@
 (deftest launch-config-tests
   (testing "LaunchConfiguration gets passed through verbatim"
     (is (identical? test-launch-config
-                    (launch-config test-launch-config)))))
+                    (launch-config test-launch-config))))
+  (testing "Maps get converted to LaunchConfigurations"
+    (let [from-map (launch-config {:load-balancers []
+                                   :networks []
+                                   :personalities []
+                                   :server-disk-config "test disk config"
+                                   :server-flavor-ref "test flavor"
+                                   :server-image-ref "test image"
+                                   :server-metadata {"test" "metadata"}
+                                   :server-name "testy mctest"})]
+      (is (= from-map test-launch-config)))))
 
 (deftest kw-to-sym-tests
   (are [kw expected] (= (kw-to-sym kw) expected)
