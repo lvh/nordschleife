@@ -71,20 +71,22 @@
           ~@method-forms
           (.build))))
 
+(defmacro ^:private pojo-wrapper
+  [cls maybe-obj]
+  `(if (instance? ~cls ~maybe-obj)
+     ~maybe-obj
+     (builder-helper (. ~cls builder) ~maybe-obj)))
+
 (defn group-config
   "Creates a group configuration.
 
   Accepts both `GroupConfiguration` objects and maps."
   [gc]
-  (if (instance? GroupConfiguration gc)
-    gc
-    (builder-helper (GroupConfiguration/builder) gc)))
+  (pojo-wrapper GroupConfiguration gc))
 
 (defn launch-config
   "Creates a launch configuration.
 
   Accepts both `LaunchConfiguration` objects and maps."
   [lc]
-  (if (instance? LaunchConfiguration lc)
-    lc
-    (builder-helper (LaunchConfiguration/builder) lc)))
+  (pojo-wrapper LaunchConfiguration lc))
