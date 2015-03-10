@@ -1,6 +1,13 @@
 (ns nordschleife.affect
   (:require [clojure.core.async :as a]))
 
+(defn repeatedly
+  [delay f target]
+  (a/thread
+    (loop []
+      (reset! target (f))
+      (a/<!! (a/timeout delay))
+      (recur))))
 (defmulti affect :type)
 
 (defmethod affect :acquiesce
