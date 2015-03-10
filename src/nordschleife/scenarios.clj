@@ -28,3 +28,11 @@
 (def scenario-gen
   "A generator for scenarios."
   (gen/vector event-gen 4 10))
+
+(defn coalesce-acquiesces
+  [scenario]
+  (reduce (fn [xs x]
+            (if (= x (last xs) :acquiesce)
+              xs (conj xs x)))
+          []
+          scenario))
