@@ -33,10 +33,18 @@
   [#^AutoscaleApi auto-scale-api #^String zone #^String group-id]
   (.getPolicyApiForZoneAndGroup auto-scale-api zone group-id))
 
-(defn create
+(defn get-group
+  "Get a scaling group."
+  [])
+
+(defn create-group
   "Create a scaling group."
-  []
-  )
+  [group-api group-config' launch-config' policies]
+  (let [group-config' (group-config group-config')
+        launch-config' (launch-config launch-config')
+        policies (map scaling-policy policies)]
+    (.create group-api group-config' launch-config' policies)))
+
 (defn kw-to-sym
   [kw]
   (let [parts (split (name kw) #"-")
