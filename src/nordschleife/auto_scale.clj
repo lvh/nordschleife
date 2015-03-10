@@ -1,5 +1,5 @@
 (ns nordschleife.auto-scale
-  (:require [com.palletops.jclouds.core :refer [define-accessors dashed make-option-map module-lookup modules]]
+  (:require [com.palletops.jclouds.core :refer [module-lookup]]
             [clojure.string :refer [capitalize lower-case join split]]
             [clojure.reflect :refer [reflect]]
             [taoensso.timbre :refer [spy]])
