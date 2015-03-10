@@ -8,6 +8,17 @@
       (reset! target (f))
       (a/<!! (a/timeout delay))
       (recur))))
+
+(defn ^:private block-until-updated
+  "Blocks until given reference type is updated, returning the new value."
+  [r]
+  (let [c (a/chan)
+        k ::block-until-updated]
+    (add-watch r k (fn [_ _ _ new-state]
+                     (remove-watch r k)
+                     (a/>!! c new-state)))
+    (a/<!! c)))
+
 (defmulti affect :type)
 
 (defmethod affect :acquiesce
