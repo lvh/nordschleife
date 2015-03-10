@@ -22,23 +22,28 @@
 (defmulti affect :type)
 
 (defmethod affect :acquiesce
-  [{compute :compute} _]
-  (loop []))
+  [{compute :compute} state-ref {desired-state :desired-state}]
+  (let [get-state #(block-until-updated state-ref)])
+  (loop [prev (get-state)
+         curr (get-state)
+         tries 10]
+    (if (and (pos? tries))
+      (recur curr (get-state) (dec tries)))))
 
 (defmethod affect :scale-up
-  [{auto-scale :auto-scale} {amount :amount}])
+  [{auto-scale :auto-scale} state-ref {amount :amount}])
 
 (defmethod affect :scale-down
-  [{auto-scale :auto-scale} {amount :amount}])
+  [{auto-scale :auto-scale} state-ref {amount :amount}])
 
 (defn perform-scenario
-  [services scenario]
-  (let [affect (partial affect services)]
+  [services state-ref scenario]
+  (let [affect (partial affect services state-ref)]
     (map affect scenario)))
 
 (defn perform-scenarios
   [services scenarios parallelism]
-  (let [perform (partial perform-scenario services)
+  (let [perform (partial perform-scenario services state-ref)
         in (a/to-chan scenarios)
         xform (map perform)
         out (a/chan)]
