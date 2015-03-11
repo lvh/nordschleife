@@ -25,10 +25,6 @@
   (gen/frequency (into [[10 (gen/return {:type :acquiesce})]]
                        events-with-amounts)))
 
-(def scenario-gen
-  "A generator for scenarios."
-  (gen/vector event-gen 4 10))
-
 (defn coalesce-acquiesces
   [scenario]
   (reduce (fn [xs x]
@@ -36,3 +32,7 @@
               xs (conj xs x)))
           []
           scenario))
+
+(def scenario-gen
+  "A generator for scenarios."
+  (gen/fmap coalesce-acquiesces (gen/vector event-gen 4 10)))
