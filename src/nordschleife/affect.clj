@@ -2,6 +2,7 @@
   (:require [clojure.core.async :as a]))
 
 (defn repeatedly
+(defn set-repeatedly
   [delay f target]
   (a/thread
     (loop []
