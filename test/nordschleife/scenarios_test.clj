@@ -9,19 +9,23 @@
          (take 10 (cycle [:a :b :c :d]))))
   (testing "adjacent coalesces"
     (are [x y] (= (coalesce-acquiesces x) y)
-         (repeat 10 :acquiesce)
-         [:acquiesce]
+         (repeat 10 {:type :acquiesce})
+         [{:type :acquiesce}]
 
-         (concat (repeat 5 :x) (repeat 5 :acquiesce) (repeat 5 :y))
-         (into [] (concat (repeat 5 :x) [:acquiesce] (repeat 5 :y)))
+         (concat (repeat 5 {:type :scale-up :amount 5})
+                 (repeat 5 {:type :acquiesce})
+                 (repeat 5 :y))
+         (into [] (concat (repeat 5 {:type :scale-up :amount 5})
+                          [{:type :acquiesce}]
+                          (repeat 5 :y)))
 
-         (concat (repeat 5 :x)
-                 (repeat 5 :acquiesce)
+         (concat (repeat 5 {:type :scale-up :amount 5})
+                 (repeat 5 {:type :acquiesce})
                  (repeat 5 :y)
-                 (repeat 5 :acquiesce)
+                 (repeat 5 {:type :acquiesce})
                  (repeat 5 :z))
-         (concat (repeat 5 :x)
-                 [:acquiesce]
+         (concat (repeat 5 {:type :scale-up :amount 5})
+                 [{:type :acquiesce}]
                  (repeat 5 :y)
-                 [:acquiesce]
+                 [{:type :acquiesce}]
                  (repeat 5 :z)))))
