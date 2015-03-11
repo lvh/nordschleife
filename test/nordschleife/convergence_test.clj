@@ -39,6 +39,12 @@
      (NodeMetadataImpl. provider-id name id location uri user-metadata tags group hardware image-id os status backend-status login-port public-addrs private-addrs credentials hostname))))
 
 (deftest measure-progress-tests
+  (testing "If convergence has been attained, progress has been made, and we're done."
+    (let [prev-state {:servers (create-servers 1)}
+          curr-state {:servers (create-servers 2)}
+          desired-state {:capacity 2}]
+      (is (= (measure-progress prev-state curr-state desired-state)
+             {:progress? true :done? true}))))
   (testing "If the capacity moves closer to the desired when scaling up, progress has been made."
     (let [prev-state {:servers (create-servers 2)}
           curr-state {:servers (create-servers 3)}
