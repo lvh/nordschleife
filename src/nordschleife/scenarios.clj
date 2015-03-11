@@ -32,7 +32,7 @@
 (defn coalesce-acquiesces
   [scenario]
   (reduce (fn [xs x]
-            (if (= x (last xs) :acquiesce)
+            (if (= (:type x) (:type (last xs)) :acquiesce)
               xs (conj xs x)))
           []
           scenario))
