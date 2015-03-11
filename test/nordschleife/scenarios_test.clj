@@ -32,7 +32,7 @@
                  [{:type :acquiesce}]
                  (repeat 5 :z)))))
 
-(defspec scenarios-dont-have-sequential-acquiesces
+(defspec scenarios-dont-have-adjacent-acquiesces
   1000
   (prop/for-all
    [s scenario-gen]
