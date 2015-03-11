@@ -1,7 +1,7 @@
 (ns nordschleife.affect
-  (:require [clojure.core.async :as a]))
+  (:require [clojure.core.async :as a]
+            [nordschleife.gathering :refer [gather]]))
 
-(defn repeatedly
 (defn set-repeatedly
   [delay f target]
   (a/thread
