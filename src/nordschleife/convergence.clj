@@ -24,6 +24,7 @@
         delta (- curr-cap prev-cap)
         dsrd-cap (:capacity desired-state)]
     (cond
+      (= curr-cap dsrd-cap) {:progress? true :done? true}
       (< prev-cap dsrd-cap curr-cap) {:progress? false
                                       :reason "overshoot"}
       (< curr-cap dsrd-cap prev-cap) {:progress? false
