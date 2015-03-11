@@ -1,6 +1,8 @@
 (ns nordschleife.scenarios-test
   (:require [nordschleife.scenarios :refer :all]
-            [clojure.test :refer :all]))
+            [clojure.test :refer :all]
+            [clojure.test.check.properties :as prop]
+            [clojure.test.check.clojure-test :refer [defspec]]))
 
 (deftest coalesce-acquiesces-tests
   (testing "no adjacent coalesces"
@@ -29,3 +31,10 @@
                  (repeat 5 :y)
                  [{:type :acquiesce}]
                  (repeat 5 :z)))))
+
+(defspec scenarios-dont-have-sequential-acquiesces
+  1000
+  (prop/for-all
+   [s scenario-gen]
+   (not-any? #(apply (partial = :acquiesce) (map :type %))
+             (partition 2 1 s))))
