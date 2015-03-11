@@ -48,5 +48,5 @@
         in (a/to-chan scenarios)
         xform (map perform)
         out (a/chan)]
-    (a/pipeline-blocking 1 out xform in)
+    (a/pipeline-blocking parallelism out xform in)
     out))
