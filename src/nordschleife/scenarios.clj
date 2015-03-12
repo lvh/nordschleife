@@ -4,6 +4,18 @@
             [clojure.test.check.generators :as gen]
             [com.gfredericks.test.chuck.generators :as gen']))
 
+(def group-config-gen
+  (gen'/for [random-str (gen'/string-from-regex #"[a-zA-Z0-9]{12}")
+             limits (gen/elements [{:cooldown 10
+                                    :min-entities 0
+                                    :max-entities 10}])]
+    (-> limits
+        (assoc :name (str "nordschleife test group " random-str)))))
+
+(def setup-gen
+  (gen'/for [group-config group-config-gen]
+    {:group-config group-config}))
+
 (defn ^:private weighted-consts
   [weights-and-consts]
   (gen/frequency
@@ -33,6 +45,11 @@
           []
           scenario))
 
-(def scenario-gen
-  "A generator for scenarios."
+(def events-gen
+  "A generator for sequences of scenario events, with some pointless
+  interactions removed."
   (gen/fmap coalesce-acquiesces (gen/vector event-gen 4 10)))
+
+(def scenario-gen
+  "A generator for scenarios, which consist of a setup + some events."
+  (gen/tuple setup-gen events-gen))
