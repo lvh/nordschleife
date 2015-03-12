@@ -33,10 +33,6 @@
   [#^AutoscaleApi auto-scale-api #^String zone #^String group-id]
   (.getPolicyApiForZoneAndGroup auto-scale-api zone group-id))
 
-(defn get-group
-  "Get a scaling group."
-  [])
-
 (defn create-group
   "Create a scaling group."
   [group-api group-config' launch-config' policies]
