@@ -35,6 +35,12 @@
 (defspec scenarios-dont-have-adjacent-acquiesces
   1000
   (prop/for-all
-   [s scenario-gen]
-   (not-any? #(apply (partial = :acquiesce) (map :type %))
-             (partition 2 1 s))))
+   [[{group-config :group-config} events] scenario-gen]
+   (and
+    (not-any? nil? ((juxt :name
+                          :cooldown
+                          :min-entities
+                          :max-entities)
+                    group-config))
+    (not-any? #(apply (partial = :acquiesce) (map :type %))
+              (partition 2 1 events)))))
