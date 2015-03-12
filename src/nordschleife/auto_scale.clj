@@ -120,3 +120,13 @@
   added id and links.`"
   [sp]
   (pojo-wrapper CreateScalingPolicy sp))
+
+(defn execute-policy
+  "Executes a policy."
+  [policy-api id]
+  (.execute policy-api id))
+
+(defn delete-policy
+  "Deletes a policy."
+  [policy-api id]
+  (.delete policy-api id))
