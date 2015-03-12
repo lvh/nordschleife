@@ -3,12 +3,17 @@
             [nordschleife.gathering :refer [gather]]))
 
 (defn set-repeatedly
+  "Sets the target to (f) repeatedly."
   [delay f target]
-  (a/thread
-    (loop []
-      (reset! target (f))
-      (a/<!! (a/timeout delay))
-      (recur))))
+  (let [should-close (atom false)]
+    (a/thread
+      (loop []
+        (reset! target (f))
+        (a/<!! (a/timeout delay))
+        (if  @should-close
+          nil
+          (recur))))
+    #(reset! should-close true)))
 
 (defn ^:private block-until-updated
   "Blocks until given reference type is updated, returning the new value."
@@ -44,9 +49,11 @@
 
 (defn perform-scenarios
   [services scenarios parallelism]
-  (let [perform (partial perform-scenario services state-ref)
+  (let [state-ref (atom nil)
+        stop-updating (set-repeatedly 10000 gather state-ref)
+        perform (partial perform-scenario services state-ref)
         in (a/to-chan scenarios)
-        xform (map perform)
+        xform (map perform-scenario)
         out (a/chan)]
     (a/pipeline-blocking parallelism out xform in)
-    out))
+    (a/<!! (a/into [] out))))
