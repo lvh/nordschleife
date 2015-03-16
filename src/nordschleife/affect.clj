@@ -1,6 +1,7 @@
 (ns nordschleife.affect
   (:require [clojure.core.async :as a]
-            [nordschleife.gathering :refer [gather]]))
+            [nordschleife.gathering :refer [gather]]
+            [nordschleife.convergence :refer [measure-progress]]))
 
 (defn set-repeatedly
   "Sets the target to (f) repeatedly."
@@ -41,8 +42,14 @@
             {progress? :progress? done? :done?} progress]
         (cond
           done? {:acquiesced? :true}
-          progress? (recur curr (get-state) max-fruitless-tries (inc total-tries))
-          (pos? tries) (recur curr (get-state) (dec tries) (inc total-tries))
+          progress? (recur curr
+                           (get-state)
+                           max-fruitless-tries
+                           (inc total-tries))
+          (pos? tries-left) (recur curr
+                                   (get-state)
+                                   (dec tries-left)
+                                   (inc total-tries))
           :default (throw RuntimeException))))))
 
 (defmethod affect :scale-up
@@ -56,10 +63,12 @@
 
 (defn ^:private required-policies
   "Finds the required policies in the given scenario."
-  [[setup events]])
+  [[setup events]]
+  (-> events
+      (filter (comp #{:scale-up :scale-down :scale-to} :type))))
 
 (defn perform-scenario
-  [{auto-scale :auto-scale} state-ref scenario]
+  [services state-ref scenario]
   (let [affect (partial affect services state-ref)]
     (map affect scenario)))
 
