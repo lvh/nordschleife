@@ -22,20 +22,30 @@
    (for [[freq const] (seq weights-and-consts)]
      [freq (gen/return const)])))
 
-(def events-with-amounts
-  (for [[weight t amount-weights] [[6 :scale-up [[10 1] [2 2] [1 3]]]
-                                   [1 :scale-up-pct [[10 5] [2 10]]]
-                                   [6 :scale-down [[10 1] [2 2] [1 3]]]
-                                   [1 :scale-down-pct [[10 5] [2 10]]]
-                                   [6 :server-failures [[10 1] [2 2] [1 3]]]]]
-    [weight
-     (gen'/for [n (weighted-consts amount-weights)]
-       {:type t :amount n})]))
+(def weighted-events
+  (for [[w t pairs][[6 :scale-up [[10 1]
+                                  [2 2]
+                                  [1 3]]]
+                    [1 :scale-up-pct [[10 5]
+                                      [2 10]]]
+                    [6 :scale-down [[10 1]
+                                    [2 2]
+                                    [1 3]]]
+                    [1 :scale-down-pct [[10 5]
+                                        [2 10]]]
+                    [2 :scale-to [[10 1]
+                                  [5 5]
+                                  [1 10]]]
+                    [6 :server-failures [[10 1]
+                                         [2 2]
+                                         [1 3]]]]]
+    [w (gen'/for [n (weighted-consts pairs)]
+         {:type t :amount n})]))
 
 (def event-gen
   "A generator for scenario events."
   (gen/frequency (into [[10 (gen/return {:type :acquiesce})]]
-                       events-with-amounts)))
+                       weighted-events)))
 
 (defn coalesce-acquiesces
   [scenario]

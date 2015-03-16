@@ -32,7 +32,7 @@
                  [{:type :acquiesce}]
                  (repeat 5 :z)))))
 
-(defspec scenarios-dont-have-adjacent-acquiesces
+(defspec scenarios-properties
   1000
   (prop/for-all
    [[{group-config :group-config} events] scenario-gen]
@@ -43,4 +43,5 @@
                           :max-entities)
                     group-config))
     (not-any? #(apply (partial = :acquiesce) (map :type %))
-              (partition 2 1 events)))))
+              (partition 2 1 events))
+    (not= (:type (first events)) :acquiesce))))
