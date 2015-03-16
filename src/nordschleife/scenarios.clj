@@ -48,17 +48,27 @@
                        weighted-events)))
 
 (defn coalesce-acquiesces
-  [scenario]
-  (reduce (fn [xs x]
-            (if (= (:type x) (:type (last xs)) :acquiesce)
-              xs (conj xs x)))
+  [evs]
+  (reduce (fn [evs ev]
+            (if (= (:type ev) (:type (last evs)) :acquiesce)
+              evs (conj evs ev)))
           []
-          scenario))
+          evs))
+
+(defn chop-head-acquiesce
+  "Acquiescing at the start is meaningless, so don't do it"
+  [evs]
+  (if (= (:type (first evs)) :acquiesce)
+    (rest evs)
+    evs))
+
+(def clean-events
+  (comp chop-head-acquiesce coalesce-acquiesces))
 
 (def events-gen
   "A generator for sequences of scenario events, with some pointless
   interactions removed."
-  (gen/fmap coalesce-acquiesces (gen/vector event-gen 4 10)))
+  (gen/fmap clean-events (gen/vector event-gen 4 10)))
 
 (def scenario-gen
   "A generator for scenarios, which consist of a setup + some events."
