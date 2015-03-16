@@ -1,16 +1,16 @@
 (ns nordschleife.scenarios-test
-  (:require [nordschleife.scenarios :refer :all]
-            [clojure.test :refer :all]
+  (:require [clojure.test.check.clojure-test :refer [defspec]]
             [clojure.test.check.properties :as prop]
-            [clojure.test.check.clojure-test :refer [defspec]]))
+            [clojure.test :refer :all]
+            [nordschleife.scenarios :refer :all]))
 
 (deftest coalesce-acquiesces-tests
   (testing "no adjacent coalesces"
-    (are [x] (= (coalesce-acquiesces x) x)
+    (are [evs] (= (coalesce-acquiesces evs) evs)
          []
          (take 10 (cycle [:a :b :c :d]))))
   (testing "adjacent coalesces"
-    (are [x y] (= (coalesce-acquiesces x) y)
+    (are [in-evs out-evs] (= (coalesce-acquiesces in-evs) out-evs)
          (repeat 10 {:type :acquiesce})
          [{:type :acquiesce}]
 
