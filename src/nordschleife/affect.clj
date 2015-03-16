@@ -27,14 +27,23 @@
 
 (defmulti affect :type)
 
+(def max-fruitless-tries
+  10)
+
 (defmethod affect :acquiesce
-  [{compute :compute} state-ref {desired-state :desired-state}]
-  (let [get-state #(block-until-updated state-ref)])
-  (loop [prev (get-state)
-         curr (get-state)
-         tries 10]
-    (if (and (pos? tries))
-      (recur curr (get-state) (dec tries)))))
+  [{compute :compute} state-ref {desired :desired-state}]
+  (let [get-state #(block-until-updated state-ref)]
+    (loop [prev (get-state)
+           curr (get-state)
+           tries-left max-fruitless-tries
+           total-tries 0]
+      (let [progress (measure-progress prev curr desired)
+            {progress? :progress? done? :done?} progress]
+        (cond
+          done? {:acquiesced? :true}
+          progress? (recur curr (get-state) max-fruitless-tries (inc total-tries))
+          (pos? tries) (recur curr (get-state) (dec tries) (inc total-tries))
+          :default (throw RuntimeException))))))
 
 (defmethod affect :scale-up
   [{auto-scale :auto-scale} state-ref {amount :amount}])

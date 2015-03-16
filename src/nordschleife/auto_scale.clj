@@ -1,5 +1,5 @@
 (ns nordschleife.auto-scale
-  (:require [com.palletops.jclouds.core :refer [module-lookup]]
+  (:require [com.palletops.jclouds.core :refer [module-lookup modules]]
             [clojure.string :refer [capitalize lower-case join split]]
             [clojure.reflect :refer [reflect]]
             [taoensso.timbre :refer [spy]])
@@ -32,14 +32,6 @@
 (defn webhook-api
   [#^AutoscaleApi auto-scale-api #^String zone #^String group-id]
   (.getPolicyApiForZoneAndGroup auto-scale-api zone group-id))
-
-(defn create-group
-  "Create a scaling group."
-  [group-api group-config' launch-config' policies]
-  (let [group-config' (group-config group-config')
-        launch-config' (launch-config launch-config')
-        policies (map scaling-policy policies)]
-    (.create group-api group-config' launch-config' policies)))
 
 (defn kw-to-sym
   [kw]
@@ -130,3 +122,11 @@
   "Deletes a policy."
   [policy-api id]
   (.delete policy-api id))
+
+(defn create-group
+  "Create a scaling group."
+  [group-api group-config' launch-config' policies]
+  (let [group-config' (group-config group-config')
+        launch-config' (launch-config launch-config')
+        policies (map scaling-policy policies)]
+    (.create group-api group-config' launch-config' policies)))
