@@ -20,7 +20,6 @@
          (into [] (concat (repeat 5 {:type :scale-up :amount 5})
                           [{:type :acquiesce}]
                           (repeat 5 :y)))
-
          (concat (repeat 5 {:type :scale-up :amount 5})
                  (repeat 5 {:type :acquiesce})
                  (repeat 5 :y)
