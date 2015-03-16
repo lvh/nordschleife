@@ -51,8 +51,15 @@
 (defmethod affect :scale-down
   [{auto-scale :auto-scale} state-ref {amount :amount}])
 
+(defmethod affect :scale-to
+  [{auto-scale :auto-scale} state-ref {amount :amount}])
+
+(defn ^:private required-policies
+  "Finds the required policies in the given scenario."
+  [[setup events]])
+
 (defn perform-scenario
-  [services state-ref scenario]
+  [{auto-scale :auto-scale} state-ref scenario]
   (let [affect (partial affect services state-ref)]
     (map affect scenario)))
 
