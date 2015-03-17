@@ -33,14 +33,14 @@
   [#^AutoscaleApi auto-scale-api #^String zone #^String group-id]
   (.getPolicyApiForZoneAndGroup auto-scale-api zone group-id))
 
-(defn kw-to-sym
+(defn ^:private kw-to-sym
   [kw]
   (let [parts (split (name kw) #"-")
         tail (map capitalize (rest parts))
         as-str (join (cons (first parts) tail))]
     (symbol as-str)))
 
-(defn sym-to-kw
+(defn ^:private sym-to-kw
   [sym]
   (let [parts (re-seq #"[a-z]+(?=[A-Z]|$)|[A-Z][a-z]*" (name sym))]
     (keyword (join "-" (map lower-case parts)))))

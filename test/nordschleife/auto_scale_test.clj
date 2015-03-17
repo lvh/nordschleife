@@ -1,5 +1,5 @@
 (ns nordschleife.auto-scale-test
-  (:require [nordschleife.auto-scale :refer :all]
+  (:require [nordschleife.auto-scale :refer :all :as as]
             [clojure.test :refer :all])
   (:import [org.jclouds.rackspace.autoscale.v1.domain GroupConfiguration LaunchConfiguration CreateScalingPolicy]))
 
@@ -70,13 +70,13 @@
       (is (= from-map test-scaling-policy)))))
 
 (deftest kw-to-sym-tests
-  (are [kw expected] (= (kw-to-sym kw) expected)
+  (are [kw expected] (= (@#'as/kw-to-sym kw) expected)
     :a 'a
     :a-b 'aB
     :a-bc-de 'aBcDe))
 
 (deftest sym-to-kw-tests
-  (are [sym expected] (= (sym-to-kw sym) expected)
+  (are [sym expected] (= (@#'as/sym-to-kw sym) expected)
     'a :a
     'someMethod :some-method
     'someOtherMethod :some-other-method))
