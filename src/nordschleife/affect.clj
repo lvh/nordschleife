@@ -64,8 +64,9 @@
 (defn ^:private required-policies
   "Finds the required policies in the given scenario."
   [[setup events]]
-  (-> events
-      (filter (comp #{:scale-up :scale-down :scale-to} :type))))
+  (->> events
+       (filter (comp #{:scale-up :scale-down :scale-to} :type))
+       (into #{})))
 
 (defn perform-scenario
   [services state-ref scenario]
