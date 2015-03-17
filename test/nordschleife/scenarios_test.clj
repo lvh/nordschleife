@@ -36,11 +36,9 @@
   (prop/for-all
    [[{group-config :group-config} events] scenario-gen]
    (and
-    (not-any? nil? ((juxt :name
-                          :cooldown
-                          :min-entities
-                          :max-entities)
-                    group-config))
+    (zero? cooldown)
+    (<= 0 min-entities max-entities 10)
+    (not (nil? (:name group-config)))
     (not-any? #(apply (partial = :acquiesce) (map :type %))
               (partition 2 1 events))
     (not= (:type (first events)) :acquiesce))))
