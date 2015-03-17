@@ -1,5 +1,6 @@
 (ns nordschleife.affect
   (:require [clojure.core.async :as a]
+            [nordschleife.auto-scale :as as]
             [nordschleife.gathering :refer [gather]]
             [nordschleife.convergence :refer [measure-progress]]))
 
@@ -52,6 +53,28 @@
                                    (inc total-tries))
           :default (throw RuntimeException))))))
 
+(def ^:private event-type->target-type
+  {:scale-up as/INCREMENTAL
+   :scale-down as/INCREMENTAL
+
+   :scale-up-pct as/PERCENT_CHANGE
+   :scale-down-pct as/PERCENT_CHANGE
+
+   :scale-to as/PERCENT_CHANGE})
+
+(def ^:private event-type->sign
+  "Given the event type, what is the sign of the amount?
+
+  The sign is encoded as a string: `-` if the sign is negative, the
+  empty string otherwise."
+  {:scale-up ""
+   :scale-down "-"
+
+   :scale-up-pct ""
+   :scale-down-pct "-"
+
+   :scale-to ""})
+
 (defn ^:private scale
   "Actually execute a scaling event."
   [{auto-scale :auto-scale} state-ref setup {amount :amount}])
@@ -73,7 +96,29 @@
   [[setup events]]
   (->> events
        (filter (comp #{:scale-up :scale-down :scale-to} :type))
+       (map (fn [event]
+              (let [ev-type (:type event)
+                    amount (:amount event)
+                    sign (event-type->sign ev-type)]
+                {:cooldown 0
+                 :type as/WEBHOOK
+                 :name (str (name ev-type) " by " amount
+                            " policy for " (:name setup))
+                 :target-type (event-type->target-type ev-type)
+                 :target (str sign amount)})))
        (into #{})))
+
+(defn ^:private create-required-policies
+  [services scenario])
+
+(defn ^:private prep-scenario
+  "Prepares all of the things that need to be true for the scenario to
+  work.
+
+  Returns the modified scenario, where the set up contains the
+  necessary policy ids."
+  [services scenario]
+  (create-required-policies services scenario))
 
 (defn perform-scenario
   [services state-ref scenario]
