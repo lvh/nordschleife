@@ -7,8 +7,8 @@
            [org.jclouds ContextBuilder]
            [org.jclouds.rackspace.autoscale.v1 AutoscaleApi]
            [org.jclouds.rackspace.autoscale.v1.domain
-           GroupConfiguration LaunchConfiguration CreateScalingPolicy
-           CreateScalingPolicy$ScalingPolicyType
+            GroupConfiguration LaunchConfiguration CreateScalingPolicy
+            CreateScalingPolicy$ScalingPolicyType
             CreateScalingPolicy$ScalingPolicyTargetType]
            [org.jclouds.rackspace.autoscale.v1.features GroupApi PolicyApi]))
 

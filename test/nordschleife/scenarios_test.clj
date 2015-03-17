@@ -7,29 +7,29 @@
 (deftest coalesce-acquiesces-tests
   (testing "no adjacent coalesces"
     (are [evs] (= (coalesce-acquiesces evs) evs)
-         []
-         (take 10 (cycle [:a :b :c :d]))))
+      []
+      (take 10 (cycle [:a :b :c :d]))))
   (testing "adjacent coalesces"
     (are [in-evs out-evs] (= (coalesce-acquiesces in-evs) out-evs)
-         (repeat 10 {:type :acquiesce})
-         [{:type :acquiesce}]
+      (repeat 10 {:type :acquiesce})
+      [{:type :acquiesce}]
 
-         (concat (repeat 5 {:type :scale-up :amount 5})
-                 (repeat 5 {:type :acquiesce})
-                 (repeat 5 :y))
-         (into [] (concat (repeat 5 {:type :scale-up :amount 5})
-                          [{:type :acquiesce}]
-                          (repeat 5 :y)))
-         (concat (repeat 5 {:type :scale-up :amount 5})
-                 (repeat 5 {:type :acquiesce})
-                 (repeat 5 :y)
-                 (repeat 5 {:type :acquiesce})
-                 (repeat 5 :z))
-         (concat (repeat 5 {:type :scale-up :amount 5})
-                 [{:type :acquiesce}]
-                 (repeat 5 :y)
-                 [{:type :acquiesce}]
-                 (repeat 5 :z)))))
+      (concat (repeat 5 {:type :scale-up :amount 5})
+              (repeat 5 {:type :acquiesce})
+              (repeat 5 :y))
+      (into [] (concat (repeat 5 {:type :scale-up :amount 5})
+                       [{:type :acquiesce}]
+                       (repeat 5 :y)))
+      (concat (repeat 5 {:type :scale-up :amount 5})
+              (repeat 5 {:type :acquiesce})
+              (repeat 5 :y)
+              (repeat 5 {:type :acquiesce})
+              (repeat 5 :z))
+      (concat (repeat 5 {:type :scale-up :amount 5})
+              [{:type :acquiesce}]
+              (repeat 5 :y)
+              [{:type :acquiesce}]
+              (repeat 5 :z)))))
 
 (defspec scenarios-properties
   1000

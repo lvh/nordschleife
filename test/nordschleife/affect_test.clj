@@ -11,10 +11,10 @@
 (deftest required-policies-tests
   (are [evs expected] (= (@#'a/required-policies [some-setup evs])
                          expected)
-       [] #{}
-       [{:type :acquiesce}] #{}
-       [{:type :scale-up :amount 5}] #{{:type :scale-up :amount 5}}
-       (repeat 3 {:type :scale-up :amount 5}) #{{:type :scale-up :amount 5}}))
+    [] #{}
+    [{:type :acquiesce}] #{}
+    [{:type :scale-up :amount 5}] #{{:type :scale-up :amount 5}}
+    (repeat 3 {:type :scale-up :amount 5}) #{{:type :scale-up :amount 5}}))
 
 (defspec required-policies-spec
   1000
