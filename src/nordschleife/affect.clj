@@ -52,14 +52,21 @@
                                    (inc total-tries))
           :default (throw RuntimeException))))))
 
+(defn ^:private scale
+  "Actually execute a scaling event."
+  [{auto-scale :auto-scale} state-ref setup {amount :amount}])
+
 (defmethod affect :scale-up
-  [{auto-scale :auto-scale} state-ref {amount :amount}])
+  [services _ setup event]
+  (scale services _ setup event))
 
 (defmethod affect :scale-down
-  [{auto-scale :auto-scale} state-ref {amount :amount}])
+  [services _ setup event]
+  (scale services _ setup event))
 
 (defmethod affect :scale-to
-  [{auto-scale :auto-scale} state-ref {amount :amount}])
+  [services _ setup event]
+  (scale services _ setup event))
 
 (defn ^:private required-policies
   "Finds the required policies in the given scenario."
