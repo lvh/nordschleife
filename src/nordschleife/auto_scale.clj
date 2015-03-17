@@ -6,7 +6,11 @@
   (:import [java.util Properties]
            [org.jclouds ContextBuilder]
            [org.jclouds.rackspace.autoscale.v1 AutoscaleApi]
-           [org.jclouds.rackspace.autoscale.v1.domain GroupConfiguration LaunchConfiguration CreateScalingPolicy CreateScalingPolicy$ScalingPolicyType  CreateScalingPolicy$ScalingPolicyTargetType]))
+           [org.jclouds.rackspace.autoscale.v1.domain
+           GroupConfiguration LaunchConfiguration CreateScalingPolicy
+           CreateScalingPolicy$ScalingPolicyType
+            CreateScalingPolicy$ScalingPolicyTargetType]
+           [org.jclouds.rackspace.autoscale.v1.features GroupApi PolicyApi]))
 
 (defn auto-scale-api
   [#^String username #^String api-key & options]
@@ -120,17 +124,17 @@
 
 (defn execute-policy
   "Executes a policy."
-  [policy-api id]
+  [#^PolicyApi policy-api id]
   (.execute policy-api id))
 
 (defn delete-policy
   "Deletes a policy."
-  [policy-api id]
+  [#^PolicyApi policy-api id]
   (.delete policy-api id))
 
 (defn create-group
   "Create a scaling group."
-  [group-api group-config' launch-config' policies]
+  [#^GroupApi group-api #^GroupConfiguration group-config' #^LaunchConfiguration launch-config' policies]
   (let [group-config' (group-config group-config')
         launch-config' (launch-config launch-config')
         policies (map scaling-policy policies)]
