@@ -26,10 +26,10 @@
                      (a/>!! c new-state)))
     (a/<!! c)))
 
-(defmulti affect :type)
-
 (def max-fruitless-tries
   10)
+
+(defmulti affect :type)
 
 (defmethod affect :acquiesce
   [{compute :compute} state-ref {desired :desired-state}]
