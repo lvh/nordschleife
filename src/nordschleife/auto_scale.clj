@@ -103,7 +103,12 @@
   CreateScalingPolicy$ScalingPolicyType/WEBHOOK)
 
 (defn scaling-policy
-  "Creates a scaling policy.
+  "Creates a scaling policy object.
+
+  Note that this doesn't actually create the scaling policy
+  upstream. You have to pass the object returned by this function to
+  something else; like a call that creates a scaling group, or one
+  that adds a scaling policy to an existing scaling group.
 
   Accepts both `CreateScalingPolicy` objects and maps.
 
