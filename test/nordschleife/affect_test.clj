@@ -19,6 +19,16 @@
    :target-type as/INCREMENTAL
    :target "5"})
 
+(def scale-down-event
+  {:type :scale-down :amount 5})
+
+(def scale-down-policy
+  {:cooldown 0
+   :name "scale-down by 5 policy for test group"
+   :type as/WEBHOOK
+   :target-type as/INCREMENTAL
+   :target "-5"})
+
 (deftest required-policies-tests
   (are [evs expected] (= (@#'a/required-policies [some-setup evs])
                          expected)
@@ -32,7 +42,13 @@
        #{scale-up-policy}
 
        (repeat 3 scale-up-event)
-       #{scale-up-policy}))
+       #{scale-up-policy}
+
+       [scale-down-event]
+       #{scale-down-policy}
+
+       (repeat 3 scale-down-event)
+       #{scale-down-policy}))
 
 (defspec required-policies-spec
   1000
