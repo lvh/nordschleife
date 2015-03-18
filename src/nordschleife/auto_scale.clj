@@ -141,3 +141,8 @@
         launch-config' (launch-config launch-config')
         policies (map scaling-policy policies)]
     (.create group-api group-config' launch-config' policies)))
+
+(defn get-policies
+  "Gets the policies for a group."
+  [#^Group group]
+  (.getScalingPolicies group))
