@@ -4,7 +4,8 @@
             [clojure.test :refer :all]
             [clojure.test.check.clojure-test :refer [defspec]]
             [clojure.test.check.properties :as prop]
-            [nordschleife.scenarios :refer [scenario-gen]]))
+            [nordschleife.scenarios :refer [scenario-gen]]
+            [taoensso.timbre :refer [spy]]))
 
 (def some-setup
   {:name "test group"})
@@ -65,4 +66,18 @@
                       as/PERCENT_CHANGE
                       as/DESIRED_CAPACITY}
                     :target-type)
-              policies)))))
+              policies)
+      (every?
+       (fn [policy]
+         (let [[target target-type] ((juxt :target :target-type)
+                                     policy)
+               [_ sign amount] (re-find #"(-?)(\d+)" target)
+               amount (Integer/parseInt amount)
+               event-type (condp = [sign target-type]
+                            ["" as/INCREMENTAL] :scale-up
+                            ["-" as/INCREMENTAL] :scale-down
+                            ["" as/PERCENT_CHANGE] :scale-up-pct
+                            ["-" as/PERCENT_CHANGE] :scale-down-pct
+                            ["" as/DESIRED_CAPACITY] :scale-to)]
+           (some #{{:type event-type :amount amount}} evs)))
+       policies)))))
