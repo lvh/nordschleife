@@ -5,7 +5,7 @@
             [com.gfredericks.test.chuck.generators :as gen']))
 
 (def group-config-gen
-  (gen'/for [random-str (gen'/string-from-regex #"[a-zA-Z0-9]{12}")
+  (gen'/for [random-str (gen/no-shrink (gen'/string-from-regex #"[a-zA-Z0-9]{12}"))
              limits (gen/elements [{:cooldown 0
                                     :min-entities 0
                                     :max-entities 10}])]
