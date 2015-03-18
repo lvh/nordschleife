@@ -60,7 +60,7 @@
    :scale-up-pct as/PERCENT_CHANGE
    :scale-down-pct as/PERCENT_CHANGE
 
-   :scale-to as/PERCENT_CHANGE})
+   :scale-to as/DESIRED_CAPACITY})
 
 (def ^:private event-type->sign
   "Given the event type, what is the sign of the amount?
