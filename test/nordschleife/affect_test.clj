@@ -30,6 +30,38 @@
    :target-type as/INCREMENTAL
    :target "-5"})
 
+(def scale-up-pct-event
+  {:type :scale-up-pct :amount 5})
+
+(def scale-up-pct-policy
+  {:cooldown 0
+   :name "scale-up-pct by 5 policy for test group"
+   :type as/WEBHOOK
+   :target-type as/PERCENT_CHANGE
+   :target "5"})
+
+(def scale-down-pct-event
+  {:type :scale-down-pct :amount 5})
+
+(def scale-down-pct-policy
+  {:cooldown 0
+   :name "scale-down-pct by 5 policy for test group"
+   :type as/WEBHOOK
+   :target-type as/PERCENT_CHANGE
+   :target "5"})
+
+(def scale-to-event
+  {:type :scale-to :amount 5})
+
+(def scale-to-policy
+  {:cooldown 0
+   :name "scale-to by 5 policy for test group"
+   :type as/WEBHOOK
+   :target-type as/DESIRED_CAPACITY
+   :target "5"})
+
+
+
 (deftest required-policies-tests
   (are [evs expected] (= (@#'a/required-policies [some-setup evs])
                          expected)
@@ -49,7 +81,36 @@
        #{scale-down-policy}
 
        (repeat 3 scale-down-event)
-       #{scale-down-policy}))
+       #{scale-down-policy}
+
+       [scale-up-pct-event]
+       #{scale-up-pct-policy}
+
+       (repeat 3 scale-up-pct-event)
+       #{scale-up-pct-policy}
+
+       [scale-down-pct-event]
+       #{scale-down-pct-policy}
+
+       (repeat 3 scale-down-pct-event)
+       #{scale-down-pct-policy}
+
+       [scale-to-event]
+       #{scale-to-policy}
+
+       (repeat 3 scale-to-event)
+       #{scale-to-policy}
+
+       (concat (repeat 3 scale-up-event)
+               (repeat 3 scale-down-event)
+               (repeat 3 scale-up-pct-event)
+               (repeat 3 scale-down-pct-event)
+               (repeat 3 scale-to-event))
+       #{scale-up-policy
+         scale-down-policy
+         scale-up-pct-policy
+         scale-down-pct-policy
+         scale-to-policy}))
 
 (defspec required-policies-spec
   1000
