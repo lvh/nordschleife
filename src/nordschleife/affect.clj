@@ -75,6 +75,14 @@
 
    :scale-to ""})
 
+(def ^:private event-types-with-policies
+  (into #{} (keys event-type->target-type)))
+
+(defn ^:private event->target
+  [event]
+  (let [sign (event-type->sign (:type event))]
+    (str sign (:amount event))))
+
 (defn ^:private scale
   "Actually execute a scaling event."
   [{auto-scale :auto-scale} state-ref setup {amount :amount}])
@@ -95,17 +103,14 @@
   "Finds the required policies in the given scenario."
   [[setup events]]
   (->> events
-       (filter (comp #{:scale-up :scale-down :scale-to} :type))
+       (filter (comp event-types-with-policies :type))
        (map (fn [event]
-              (let [ev-type (:type event)
-                    amount (:amount event)
-                    sign (event-type->sign ev-type)]
-                {:cooldown 0
-                 :type as/WEBHOOK
-                 :name (str (name ev-type) " by " amount
-                            " policy for " (:name setup))
-                 :target-type (event-type->target-type ev-type)
-                 :target (str sign amount)})))
+              {:cooldown 0
+               :type as/WEBHOOK
+               :name (str (name (:type event)) " by " (:amount event)
+                          " policy for " (:name setup))
+               :target-type (event-type->target-type (:type event))
+               :target (event->target event)}))
        (into #{})))
 
 (defn ^:private create-required-policies
