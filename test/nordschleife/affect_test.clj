@@ -48,7 +48,7 @@
    :name "scale-down-pct by 5 policy for test group"
    :type as/WEBHOOK
    :target-type as/PERCENT_CHANGE
-   :target "5"})
+   :target "-5"})
 
 (def scale-to-event
   {:type :scale-to :amount 5})
