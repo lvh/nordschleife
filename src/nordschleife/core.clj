@@ -10,7 +10,7 @@
 
 (defn run-1
   []
-  (perform-scenarios services (sample 10) 10))
+  (perform-scenarios services (sample 1) 10))
 
 (defn -main
   "I don't do a whole lot ... yet."
