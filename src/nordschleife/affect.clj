@@ -15,7 +15,7 @@
       (loop []
         (reset! target (f))
         (a/<!! (a/timeout delay))
-        (if  @should-close
+        (if @should-close
           nil
           (recur))))
     #(reset! should-close true)))
