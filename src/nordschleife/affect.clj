@@ -5,6 +5,8 @@
             [nordschleife.convergence :refer [measure-progress]]
             [taoensso.timbre :refer [debug info spy]]))
 
+(def zone "ORD")
+
 (defn set-repeatedly
   "Sets the target to (f) repeatedly."
   [delay f target]
@@ -138,7 +140,7 @@
   necessary policy ids."
   [{auto-scale :auto-scale} scenario]
   (let [policies (required-policies scenario)
-        api (as/group-api auto-scale "ORD")
+        api (as/group-api auto-scale zone)
         [setup events] scenario
         [gc lc] ((juxt :group-config :launch-config) setup)
         group (as/create-group api gc lc policies)
