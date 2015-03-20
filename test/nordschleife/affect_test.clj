@@ -128,7 +128,9 @@
                      ["" as/PERCENT_CHANGE] :scale-up-pct
                      ["-" as/PERCENT_CHANGE] :scale-down-pct
                      ["" as/DESIRED_CAPACITY] :scale-to)]
-    (boolean (some #{{:type event-type :amount amount}} events))))
+    (boolean (some #(= (select-keys % [:type :amount])
+                       {:type event-type :amount amount})
+                   events))))
 
 (defspec required-policies-spec
   1000
