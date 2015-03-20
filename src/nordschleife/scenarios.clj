@@ -95,7 +95,7 @@
 (defn ^:private compute-desired-states
   [[setup evs]]
   (let [capacity (fn [event] (or (-> event :desired-state :capacity) 0))
-        [max-cap min-cap] ((juxt :min-entities :max-entities)
+        [min-cap max-cap] ((juxt :min-entities :max-entities)
                            (:group-config setup))
         evs (reduce
              (fn [events event]
