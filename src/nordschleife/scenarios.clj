@@ -11,7 +11,7 @@
 (def launch-config-gen
   (gen/elements
    [{:load-balancers []
-     :networks []
+     :networks [service-net]
      :personalities []
      :server-name "nordschleife test server "
      :server-image-ref "0938b7e9-ba56-4af2-a9e6-52c47d931d22"
