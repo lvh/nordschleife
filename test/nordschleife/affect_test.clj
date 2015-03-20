@@ -150,7 +150,7 @@
               policies)
       (every? (partial policy-has-matching-event? evs) policies)))))
 
-(defn create-test-api
+(defn create-test-services
   []
   (let [state (atom {:groups-by-id {}
                      :executed-policies-by-group-id {}})
@@ -172,11 +172,11 @@
                 (reify PolicyApi
                   (execute [_ policy-id]
                     (update-in state group-id policy-id (fnil inc 0))))))]
-    {:api api :state state}))
+    {:auto-scale api :state state}))
 
 (defspec prep-scenario-spec
-  (let [{api :api} (create-test-api)
-        prep (partial @#'a/prep-scenario {:auto-scale api})]
+  (let [test-services (create-test-services)
+        prep (partial @#'a/prep-scenario test-services)]
     (prop/for-all
      [scenario scenario-gen]
      (not (nil? (:group (first (prep scenario)))))
