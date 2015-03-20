@@ -23,7 +23,8 @@
   (gen'/for [random-str (gen/no-shrink (gen'/string-from-regex #"[a-zA-Z0-9]{12}"))
              limits (gen/elements [{:cooldown 0
                                     :min-entities 0
-                                    :max-entities 10}])]
+                                    :max-entities 10
+                                    :metadata {}}])]
     (-> limits
         (assoc :name (str "nordschleife test group " random-str)))))
 
