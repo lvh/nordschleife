@@ -5,7 +5,10 @@
             [clojure.test.check.clojure-test :refer [defspec]]
             [clojure.test.check.properties :as prop]
             [nordschleife.scenarios :refer [scenario-gen]]
-            [taoensso.timbre :refer [spy]]))
+            [taoensso.timbre :refer [spy]])
+  (:import [org.jclouds.rackspace.autoscale.v1 AutoscaleApi]
+           [org.jclouds.rackspace.autoscale.v1.features GroupApi PolicyApi]
+           [org.jclouds.rackspace.autoscale.v1.domain Group]))
 
 (def some-setup
   {:name "test group"})
@@ -14,53 +17,56 @@
   {:type :scale-up :amount 5})
 
 (def scale-up-policy
-  {:cooldown 0
-   :name "scale-up by 5 policy for test group"
-   :type as/WEBHOOK
-   :target-type as/INCREMENTAL
-   :target "5"})
+  (as/scaling-policy
+   {:cooldown 0
+    :name "scale-up by 5 policy for test group"
+    :type as/WEBHOOK
+    :target-type as/INCREMENTAL
+    :target "5"}))
 
 (def scale-down-event
   {:type :scale-down :amount 5})
 
 (def scale-down-policy
-  {:cooldown 0
-   :name "scale-down by 5 policy for test group"
-   :type as/WEBHOOK
-   :target-type as/INCREMENTAL
-   :target "-5"})
+  (as/scaling-policy
+   {:cooldown 0
+    :name "scale-down by 5 policy for test group"
+    :type as/WEBHOOK
+    :target-type as/INCREMENTAL
+    :target "-5"}))
 
 (def scale-up-pct-event
   {:type :scale-up-pct :amount 5})
 
 (def scale-up-pct-policy
-  {:cooldown 0
-   :name "scale-up-pct by 5 policy for test group"
-   :type as/WEBHOOK
-   :target-type as/PERCENT_CHANGE
-   :target "5"})
+  (as/scaling-policy
+   {:cooldown 0
+    :name "scale-up-pct by 5 policy for test group"
+    :type as/WEBHOOK
+    :target-type as/PERCENT_CHANGE
+    :target "5"}))
 
 (def scale-down-pct-event
   {:type :scale-down-pct :amount 5})
 
 (def scale-down-pct-policy
-  {:cooldown 0
-   :name "scale-down-pct by 5 policy for test group"
-   :type as/WEBHOOK
-   :target-type as/PERCENT_CHANGE
-   :target "-5"})
+  (as/scaling-policy
+   {:cooldown 0
+    :name "scale-down-pct by 5 policy for test group"
+    :type as/WEBHOOK
+    :target-type as/PERCENT_CHANGE
+    :target "-5"}))
 
 (def scale-to-event
   {:type :scale-to :amount 5})
 
 (def scale-to-policy
-  {:cooldown 0
-   :name "scale-to by 5 policy for test group"
-   :type as/WEBHOOK
-   :target-type as/DESIRED_CAPACITY
-   :target "5"})
-
-
+  (as/scaling-policy
+   {:cooldown 0
+    :name "scale-to by 5 policy for test group"
+    :type as/WEBHOOK
+    :target-type as/DESIRED_CAPACITY
+    :target "5"}))
 
 (deftest required-policies-tests
   (are [evs expected] (= (@#'a/required-policies [some-setup evs])
@@ -114,17 +120,15 @@
 
 (defn ^:private policy-has-matching-event?
   [events policy]
-  (let [[target target-type] ((juxt :target :target-type)
-                              policy)
-        [_ sign amount] (re-find #"(-?)(\d+)" target)
+  (let [[_ sign amount] (re-find #"(-?)(\d+)" (.getTarget policy))
         amount (Integer/parseInt amount)
-        event-type (condp = [sign target-type]
+        event-type (condp = [sign (.getTargetType policy)]
                      ["" as/INCREMENTAL] :scale-up
                      ["-" as/INCREMENTAL] :scale-down
                      ["" as/PERCENT_CHANGE] :scale-up-pct
                      ["-" as/PERCENT_CHANGE] :scale-down-pct
                      ["" as/DESIRED_CAPACITY] :scale-to)]
-    (some #{{:type event-type :amount amount}} events)))
+    (boolean (some #{{:type event-type :amount amount}} events))))
 
 (defspec required-policies-spec
   1000
@@ -134,12 +138,46 @@
          policies (@#'a/required-policies scenario)]
      (and
       (set? policies)
-      (every? #(and (= (:cooldown %) 0)
-                    (= (:type %) as/WEBHOOK))
+      (every? #(and (= (.getCooldown %) 0)
+                    (= (.getType %) as/WEBHOOK))
               policies)
       (every? (comp #{as/INCREMENTAL
                       as/PERCENT_CHANGE
                       as/DESIRED_CAPACITY}
-                    :target-type)
+                    #(.getTargetType %))
               policies)
       (every? (partial policy-has-matching-event? evs) policies)))))
+
+(defn create-test-api
+  []
+  (let [state (atom {:groups-by-id {}
+                     :executed-policies-by-group-id {}})
+        group-api (reify GroupApi
+                    (create [_ group-config launch-config policies]
+                      (let [id (str (gensym "test group "))
+                            group (-> (Group/builder)
+                                      (.id id)
+                                      (.groupConfiguration group-config)
+                                      (.launchConfiguration launch-config)
+                                      (.scalingPolicy policies)
+                                      (.build))]
+                        (swap! state assoc-in [:groups-by-id id] group)
+                        group)))
+        api (reify AutoscaleApi
+              (getGroupApiForZone [_ _]
+                group-api)
+              (getPolicyApiForZoneAndGroup [_ _ group-id]
+                (reify PolicyApi
+                  (execute [_ policy-id]
+                    (update-in state group-id policy-id (fnil inc 0))))))]
+    {:api api :state state}))
+
+(defspec prep-scenario-spec
+  (let [{api :api} (create-test-api)
+        prep (partial @#'a/prep-scenario {:auto-scale api})]
+    (prop/for-all
+     [scenario scenario-gen]
+     (not (nil? (:group (first (prep scenario)))))
+     (let [[_ events] scenario]
+       (every? (partial policy-has-matching-event? events)
+               (vals (:policy-index (first (prep scenario)))))))))
