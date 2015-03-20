@@ -35,13 +35,11 @@
   1000
   (prop/for-all
    [[setup events] scenario-gen]
-   (let [{{cd :cooldown
-           min :min-entities
-           max :max-entities
-           name :name} :group-config} setup]
-     (and (>= 0 cd)
-          (<= 0 min max 10)
-          (not (nil? name))))
-   (not-any? #(apply (partial = :acquiesce) (map :type %))
-             (partition 2 1 events))
+   (<= 0 (-> setup :group-config :cooldown) 10)
+   (re-find #"nordschleife test group [a-zA-Z0-9]{12}"
+            (-> setup :group-config :name))
+   (let [{{min :min-entities max :max-entities} :group-config} setup]
+     (<= 0 min max 10))
+   (not-any? #(apply = :acquiesce %)
+             (partition 2 1 (map :type events)))
    (not= (:type (first events)) :acquiesce)))
