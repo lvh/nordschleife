@@ -33,16 +33,20 @@
 (defmulti affect :type)
 
 (defmethod affect :acquiesce
-  [{compute :compute} state-ref {desired :desired-state}]
-  (let [get-state #(block-until-updated state-ref)]
+  [{compute :compute} state-ref setup event]
+  (let [get-state #(block-until-updated state-ref)
+        {desired :desired-state} event]
     (loop [prev (get-state)
            curr (get-state)
            tries-left max-fruitless-tries
-           total-tries 0]
+           total-tries 1]
       (let [progress (measure-progress prev curr desired)
-            {progress? :progress? done? :done?} progress]
+            {progress? :progress? done? :done?} progress
+            ctx {:total-tries total-tries
+                 :group (-> setup :group-config :name)
+                 :event event}]
         (cond
-          done? {:acquiesced? :true}
+          done? (merge ctx {:acquiesced? true})
           progress? (recur curr
                            (get-state)
                            max-fruitless-tries
@@ -51,7 +55,7 @@
                                    (get-state)
                                    (dec tries-left)
                                    (inc total-tries))
-          :default (throw RuntimeException))))))
+          :default (merge ctx {:acquiesced? false}))))))
 
 (def ^:private event-type->target-type
   {:scale-up as/INCREMENTAL
