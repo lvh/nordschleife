@@ -2,7 +2,8 @@
   (:require [clojure.core.async :as a]
             [nordschleife.auto-scale :as as]
             [nordschleife.gathering :refer [gather]]
-            [nordschleife.convergence :refer [measure-progress]]))
+            [nordschleife.convergence :refer [measure-progress]]
+            [taoensso.timbre :refer [info]]))
 
 (defn set-repeatedly
   "Sets the target to (f) repeatedly."
@@ -150,9 +151,10 @@
 
 (defn perform-scenario
   [services state-ref scenario]
-  (prep-scenario services scenario)
-  (let [affect (partial affect services state-ref)]
-    (map affect scenario)))
+  (let [[setup evs] (prep-scenario services scenario)
+        affect (partial affect services state-ref setup)]
+    (info "Performing scenario" scenario)
+    (map affect evs)))
 
 (defn perform-scenarios
   [services scenarios parallelism]
@@ -162,5 +164,9 @@
         in (a/to-chan scenarios)
         xform (map perform-scenario)
         out (a/chan)]
+    (info "Performing scenarios" scenarios)
     (a/pipeline-blocking parallelism out xform in)
-    (a/<!! (a/into [] out))))
+    (let [res (a/<!! (a/into [] out))]
+      (stop-updating)
+      (a/close! out)
+      res)))
