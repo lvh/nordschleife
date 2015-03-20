@@ -3,7 +3,7 @@
             [nordschleife.auto-scale :as as]
             [nordschleife.gathering :refer [gather]]
             [nordschleife.convergence :refer [measure-progress]]
-            [taoensso.timbre :refer [info]]))
+            [taoensso.timbre :refer [debug info spy]]))
 
 (defn set-repeatedly
   "Sets the target to (f) repeatedly."
@@ -152,9 +152,9 @@
 
 (defn perform-scenario
   [services state-ref scenario]
-  (let [[setup evs] (prep-scenario services scenario)
+  (info "Performing scenario" scenario)
+  (let [[setup evs] (spy (prep-scenario services scenario))
         affect (partial affect services state-ref setup)]
-    (info "Performing scenario" scenario)
     (map affect evs)))
 
 (defn perform-scenarios
