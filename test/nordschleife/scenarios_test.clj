@@ -63,4 +63,7 @@
              (partition 2 1 (map :type events)))
 
    ;; Scenarios can't start by acquiescing.
-   (not= (:type (first events)) :acquiesce)))
+   (not= (:type (first events)) :acquiesce)
+
+   ;; Scenarios always end by acquiescing.
+   (= (:type (last events)) :acquiesce)))
