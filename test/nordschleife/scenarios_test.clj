@@ -35,11 +35,21 @@
   1000
   (prop/for-all
    [[setup events] scenario-gen]
+
+   ;; The group cooldown is reasonable.
    (<= 0 (-> setup :group-config :cooldown) 10)
+
+   ;; The group name is valid.
    (re-find #"nordschleife test group [a-zA-Z0-9]{12}"
             (-> setup :group-config :name))
+
+   ;; The group min and max are valid.
    (let [{{min :min-entities max :max-entities} :group-config} setup]
      (<= 0 min max 10))
+
+   ;; There are never two acquiesces after each other.
    (not-any? #(apply = :acquiesce %)
              (partition 2 1 (map :type events)))
+
+   ;; Scenarios can't start by acquiescing.
    (not= (:type (first events)) :acquiesce)))
