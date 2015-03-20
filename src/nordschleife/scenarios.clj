@@ -5,6 +5,9 @@
             [com.gfredericks.test.chuck.generators :as gen']
             [clojure.math.numeric-tower :as math]))
 
+(def service-net "11111111-1111-1111-1111-111111111111")
+(def public-net "00000000-0000-0000-0000-000000000000")
+
 (def launch-config-gen
   (gen/elements
    [{:load-balancers []
