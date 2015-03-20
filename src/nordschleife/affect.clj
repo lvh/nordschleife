@@ -33,7 +33,7 @@
 (def max-fruitless-tries
   10)
 
-(defmulti affect :type)
+(defmulti affect (fn [_ _ _ event] (:type event)))
 
 (defmethod affect :acquiesce
   [{compute :compute} state-ref setup event]
