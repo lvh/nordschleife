@@ -112,6 +112,20 @@
          scale-down-pct-policy
          scale-to-policy}))
 
+(defn ^:private policy-has-matching-event?
+  [events policy]
+  (let [[target target-type] ((juxt :target :target-type)
+                              policy)
+        [_ sign amount] (re-find #"(-?)(\d+)" target)
+        amount (Integer/parseInt amount)
+        event-type (condp = [sign target-type]
+                     ["" as/INCREMENTAL] :scale-up
+                     ["-" as/INCREMENTAL] :scale-down
+                     ["" as/PERCENT_CHANGE] :scale-up-pct
+                     ["-" as/PERCENT_CHANGE] :scale-down-pct
+                     ["" as/DESIRED_CAPACITY] :scale-to)]
+    (some #{{:type event-type :amount amount}} events)))
+
 (defspec required-policies-spec
   1000
   (prop/for-all
@@ -128,17 +142,4 @@
                       as/DESIRED_CAPACITY}
                     :target-type)
               policies)
-      (every?
-       (fn [policy]
-         (let [[target target-type] ((juxt :target :target-type)
-                                     policy)
-               [_ sign amount] (re-find #"(-?)(\d+)" target)
-               amount (Integer/parseInt amount)
-               event-type (condp = [sign target-type]
-                            ["" as/INCREMENTAL] :scale-up
-                            ["-" as/INCREMENTAL] :scale-down
-                            ["" as/PERCENT_CHANGE] :scale-up-pct
-                            ["-" as/PERCENT_CHANGE] :scale-down-pct
-                            ["" as/DESIRED_CAPACITY] :scale-to)]
-           (some #{{:type event-type :amount amount}} evs)))
-       policies)))))
+      (every? (partial policy-has-matching-event? evs) policies)))))
