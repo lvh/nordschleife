@@ -16,6 +16,7 @@
      :server-name "nordschleife test server "
      :server-image-ref "0938b7e9-ba56-4af2-a9e6-52c47d931d22"
      :server-flavor-ref "general1-1"
+     :server-disk-config "AUTO"
      :server-metadata {}}]))
 
 (def group-config-gen
