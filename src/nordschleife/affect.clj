@@ -3,7 +3,9 @@
             [nordschleife.auto-scale :as as]
             [nordschleife.gathering :refer [gather]]
             [nordschleife.convergence :refer [measure-progress]]
-            [taoensso.timbre :refer [debug info spy]]))
+            [taoensso.timbre :refer [debug info spy]])
+  (:import [org.jclouds.http HttpResponseException]
+           [org.jclouds.rest AuthorizationException]))
 
 (def zone "ORD")
 
@@ -93,13 +95,19 @@
 (defn ^:private scale
   "Actually execute a scaling event."
   [{auto-scale :auto-scale} _ setup event]
-  (info "Scaling" event setup)
-  (let [api (as/policy-api auto-scale)
+  (info "Scaling" ((juxt :type :amount) event))
+  (let [api (as/policy-api auto-scale zone (.getId (:group setup)))
         key [(event-type->target-type (:type event))
-                    (event->target event)]
-        policy (-> setup :policy-index key)
+             (event->target event)]
+        policy ((:policy-index setup) key)
         id (.getId policy)
-        result (as/execute-policy api id)]
+        result (try {:success? (as/execute-policy api id)}
+                    (catch HttpResponseException e
+                      {:success? false
+                       :reason (.getContent e)})
+                    (catch AuthorizationException e
+                      {:success? false
+                       :reason (.getContent (.getCause e))}))]
     {:event event :result result :group (-> setup :group-config :name)}))
 
 (defmethod affect :scale-up
