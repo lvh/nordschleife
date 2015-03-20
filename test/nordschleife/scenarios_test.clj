@@ -36,6 +36,17 @@
   (prop/for-all
    [[setup events] scenario-gen]
 
+   ;; The launch configuration is always the fixed, known-good one.
+   ;; Note that JClouds requires more args than Auto Scale does.
+   (= (:launch-config setup)
+      {:load-balancers []
+       :networks []
+       :personalities []
+       :server-name "nordschleife test server "
+       :server-image-ref "0938b7e9-ba56-4af2-a9e6-52c47d931d22" ;; Debian 7
+       :server-flavor-ref "general1-1"
+       :server-metadata {}})
+
    ;; The group cooldown is reasonable.
    (<= 0 (-> setup :group-config :cooldown) 10)
 
