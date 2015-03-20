@@ -6,7 +6,7 @@
   (:gen-class))
 
 (def the-scenario
-  (sample 1))
+  (first (sample 1)))
 
 (defn run-1
   []
