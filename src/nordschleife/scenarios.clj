@@ -59,6 +59,10 @@
   (gen/frequency (into [[10 (gen/return {:type :acquiesce})]]
                        weighted-events)))
 
+(defn add-tail-acquiesce
+  [evs]
+  (conj evs {:type :acquiesce}))
+
 (defn coalesce-acquiesces
   [evs]
   (reduce (fn [evs ev]
@@ -75,7 +79,7 @@
     evs))
 
 (def clean-events
-  (comp chop-head-acquiesce coalesce-acquiesces))
+  (comp coalesce-acquiesces chop-head-acquiesce add-tail-acquiesce))
 
 (def events-gen
   "A generator for sequences of scenario events, with some pointless
