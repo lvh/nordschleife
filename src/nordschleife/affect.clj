@@ -98,6 +98,9 @@
 (defmethod affect :scale-to
   [services _ setup event]
   (scale services _ setup event))
+(defmethod affect :server-failures
+  [services state-ref setup event]
+  {:event event})
 
 (defn ^:private required-policies
   "Finds the required policies in the given scenario."
