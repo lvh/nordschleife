@@ -91,6 +91,7 @@
 (defn ^:private scale
   "Actually execute a scaling event."
   [{auto-scale :auto-scale} _ setup event]
+  (info "Scaling" event setup)
   (let [api (as/policy-api auto-scale)
         key [(event-type->target-type (:type event))
                     (event->target event)]
