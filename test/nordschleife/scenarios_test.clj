@@ -37,7 +37,7 @@
    [[setup events] scenario-gen]
 
    ;; The launch configuration is always the fixed, known-good one.
-   ;; Note that JClouds requires more args than Auto Scale does.
+   ;; Note that jClouds requires more args than Auto Scale does.
    (= (:launch-config setup)
       {:load-balancers []
        :networks []
