@@ -114,20 +114,28 @@
        (map as/scaling-policy)
        (into #{})))
 
-(defn ^:private create-required-policies
-  [services scenario])
-
 (defn ^:private prep-scenario
-  "Prepares all of the things that need to be true for the scenario to
-  work.
+  "Prepares the context the scenario needs to run.
 
-  Returns the modified scenario, where the set up contains the
+  Returns the modified scenario, where the setup contains the
   necessary policy ids."
-  [services scenario]
-  (create-required-policies services scenario))
+  [{auto-scale :auto-scale} scenario]
+  (let [policies (required-policies scenario)
+        api (as/group-api auto-scale "the zone")
+        [setup events] scenario
+        [gc lc] ((juxt :group-config :launch-config) setup)
+        group (as/create-group api gc lc policies)
+        created-policies (as/get-policies group)
+        policy-idx (into {} (map (fn [policy]
+                                   [[(.getTargetType policy) (.getTarget policy)]
+                                    policy])
+                                 created-policies))]
+    [(merge setup {:group group :policy-index policy-idx})
+     events]))
 
 (defn perform-scenario
   [services state-ref scenario]
+  (prep-scenario services scenario)
   (let [affect (partial affect services state-ref)]
     (map affect scenario)))
 
