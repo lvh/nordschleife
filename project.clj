@@ -26,7 +26,10 @@
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]
 
                  ;; Logging
-                 [com.taoensso/timbre "3.4.0"]]
+                 [com.taoensso/timbre "3.4.0"]
+
+                 ;; Math (yay, rounding)
+                 [org.clojure/math.numeric-tower "0.0.4"]]
   :plugins [[lein-cljfmt "0.1.10"]]
   :main ^:skip-aot nordschleife.core
   :target-path "target/%s"
