@@ -163,7 +163,7 @@
         stop-updating (set-repeatedly 10000 gather state-ref)
         perform (partial perform-scenario services state-ref)
         in (a/to-chan scenarios)
-        xform (map perform-scenario)
+        xform (map perform)
         out (a/chan)]
     (info "Performing scenarios" scenarios)
     (a/pipeline-blocking parallelism out xform in)
