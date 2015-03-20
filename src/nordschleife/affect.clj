@@ -138,7 +138,7 @@
   necessary policy ids."
   [{auto-scale :auto-scale} scenario]
   (let [policies (required-policies scenario)
-        api (as/group-api auto-scale "the zone")
+        api (as/group-api auto-scale "ORD")
         [setup events] scenario
         [gc lc] ((juxt :group-config :launch-config) setup)
         group (as/create-group api gc lc policies)
