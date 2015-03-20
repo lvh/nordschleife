@@ -167,7 +167,6 @@
         in (a/to-chan scenarios)
         xform (map perform)
         out (a/chan)]
-    (info "Performing scenarios" scenarios)
     (a/pipeline-blocking parallelism out xform in)
     (let [res (a/<!! (a/into [] out))]
       (stop-updating)
