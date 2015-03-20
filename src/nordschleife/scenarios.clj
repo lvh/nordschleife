@@ -4,6 +4,13 @@
             [clojure.test.check.generators :as gen]
             [com.gfredericks.test.chuck.generators :as gen']))
 
+(def launch-config-gen
+  (gen'/for []
+    {:load-balancers []
+     :server-name "nordschleife test server "
+     :server-image-ref "0938b7e9-ba56-4af2-a9e6-52c47d931d22"
+     :server-flavor-ref "general1-1"}))
+
 (def group-config-gen
   (gen'/for [random-str (gen/no-shrink (gen'/string-from-regex #"[a-zA-Z0-9]{12}"))
              limits (gen/elements [{:cooldown 0
@@ -13,8 +20,10 @@
         (assoc :name (str "nordschleife test group " random-str)))))
 
 (def setup-gen
-  (gen'/for [group-config group-config-gen]
-    {:group-config group-config}))
+  (gen'/for [group-config group-config-gen
+             launch-config launch-config-gen]
+    {:group-config group-config
+     :launch-config launch-config}))
 
 (defn ^:private weighted-consts
   [weights-and-consts]
