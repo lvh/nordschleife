@@ -10,7 +10,8 @@
             Group
             GroupConfiguration LaunchConfiguration CreateScalingPolicy
             CreateScalingPolicy$ScalingPolicyType
-            CreateScalingPolicy$ScalingPolicyTargetType]
+            CreateScalingPolicy$ScalingPolicyTargetType
+            LaunchConfiguration$LaunchConfigurationType]
            [org.jclouds.rackspace.autoscale.v1.features GroupApi PolicyApi]))
 
 (defn auto-scale-api
@@ -85,12 +86,19 @@
   [gc]
   (pojo-wrapper GroupConfiguration gc))
 
+(def LAUNCH_SERVER
+  LaunchConfiguration$LaunchConfigurationType/LAUNCH_SERVER)
+
 (defn launch-config
   "Creates a launch configuration.
 
-  Accepts both `LaunchConfiguration` objects and maps."
+  Accepts both `LaunchConfiguration` objects and maps. If it is a map,
+  LAUNCH_SERVER (the only option) is assumed as the type."
   [lc]
-  (pojo-wrapper LaunchConfiguration lc))
+  (pojo-wrapper LaunchConfiguration
+                (if (map? lc)
+                  (assoc lc :type LAUNCH_SERVER)
+                  lc)))
 
 (def DESIRED_CAPACITY
   CreateScalingPolicy$ScalingPolicyTargetType/DESIRED_CAPACITY)
