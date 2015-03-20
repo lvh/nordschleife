@@ -34,11 +34,14 @@
 (defspec scenarios-properties
   1000
   (prop/for-all
-   [[{group-config :group-config} events] scenario-gen]
-   (and
-    (zero? cooldown)
-    (<= 0 min-entities max-entities 10)
-    (not (nil? (:name group-config)))
-    (not-any? #(apply (partial = :acquiesce) (map :type %))
-              (partition 2 1 events))
-    (not= (:type (first events)) :acquiesce))))
+   [[setup events] scenario-gen]
+   (let [{{cd :cooldown
+           min :min-entities
+           max :max-entities
+           name :name} :group-config} setup]
+     (and (>= 0 cd)
+          (<= 0 min max 10)
+          (not (nil? name))))
+   (not-any? #(apply (partial = :acquiesce) (map :type %))
+             (partition 2 1 events))
+   (not= (:type (first events)) :acquiesce)))
