@@ -66,4 +66,8 @@
    (not= (:type (first events)) :acquiesce)
 
    ;; Scenarios always end by acquiescing.
-   (= (:type (last events)) :acquiesce)))
+   (= (:type (last events)) :acquiesce)
+
+   ;; All events know how much capacity they're expecting.
+   (let [{{min :min-entities max :max-entities} :group-config} setup]
+     (every? (fn [ev] (<= min (-> ev :desired-state :capacity) max)) events))))
