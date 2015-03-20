@@ -116,6 +116,9 @@
   "A generator for scenarios, which consist of a setup + some events."
   (gen/fmap compute-desired-states (gen/tuple setup-gen events-gen)))
 
+(def sample
+  (partial gen/sample scenario-gen))
+
 (defn ^:private round-away-from-zero
   "Round the way Auto Scale rounds."
   [x]
