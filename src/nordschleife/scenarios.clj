@@ -86,6 +86,30 @@
   interactions removed."
   (gen/fmap clean-events (gen/vector event-gen 4 10)))
 
+(defn ^:private clamp
+  [x low high]
+  (-> x (max low) (min high)))
+
+(defn ^:private compute-desired-states
+  [[setup evs]]
+  (let [capacity (fn [event] (or (-> event :desired-state :capacity) 0))
+        [max-cap min-cap] ((juxt :min-entities :max-entities)
+                           (:group-config setup))
+        evs (reduce
+             (fn [events event]
+               (let [prev-cap (capacity (last events))
+                     this-cap (condp = (:type event)
+                                :scale-to (:amount event)
+                                :scale-up (+ prev-cap (:amount event))
+                                :scale-down (- prev-cap (:amount event))
+                                prev-cap)
+                     this-cap (clamp  this-cap min-cap max-cap)
+                     event (assoc event :desired-state {:capacity this-cap})]
+                 (conj events event)))
+             []
+             evs)]
+    [setup evs]))
+
 (def scenario-gen
   "A generator for scenarios, which consist of a setup + some events."
-  (gen/tuple setup-gen events-gen))
+  (gen/fmap compute-desired-states (gen/tuple setup-gen events-gen)))
