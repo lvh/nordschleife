@@ -85,19 +85,27 @@
 
 (defn ^:private scale
   "Actually execute a scaling event."
-  [{auto-scale :auto-scale} state-ref setup {amount :amount}])
+  [{auto-scale :auto-scale} _ setup event]
+  (let [api (as/policy-api auto-scale)
+        key [(event-type->target-type (:type event))
+                    (event->target event)]
+        policy (-> setup :policy-index key)
+        id (.getId policy)
+        result (as/execute-policy api id)]
+    {:event event :result result :group (-> setup :group-config :name)}))
 
 (defmethod affect :scale-up
-  [services _ setup event]
-  (scale services _ setup event))
+  [services state-ref setup event]
+  (scale services state-ref setup event))
 
 (defmethod affect :scale-down
-  [services _ setup event]
-  (scale services _ setup event))
+  [services state-ref setup event]
+  (scale services state-ref setup event))
 
 (defmethod affect :scale-to
-  [services _ setup event]
-  (scale services _ setup event))
+  [services state-ref setup event]
+  (scale services state-ref setup event))
+
 (defmethod affect :server-failures
   [services state-ref setup event]
   {:event event})
