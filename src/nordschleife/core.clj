@@ -1,6 +1,6 @@
 (ns nordschleife.core
   (:require [nordschleife.services :refer [services]]
-            [nordschleife.affect :refer [perform-scenarios]]
+            [nordschleife.affect :refer [affect perform-scenarios]]
             [nordschleife.scenarios :refer [sample]]
             [nordschleife.gathering :refer [gather]])
   (:gen-class))
@@ -10,7 +10,7 @@
 
 (defn run-1
   []
-  (perform-scenarios services (sample 1) 10))
+  (perform-scenarios services [the-scenario] 10))
 
 (defn -main
   "I don't do a whole lot ... yet."
