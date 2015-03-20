@@ -111,6 +111,7 @@
                           " policy for " (:name setup))
                :target-type (event-type->target-type (:type event))
                :target (event->target event)}))
+       (map as/scaling-policy)
        (into #{})))
 
 (defn ^:private create-required-policies
