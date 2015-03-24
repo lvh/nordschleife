@@ -26,7 +26,7 @@
   "Blocks until given reference type is updated, returning the new value."
   [r]
   (let [c (a/chan)
-        k ::block-until-updated]
+        k (gensym)]
     (add-watch r k (fn [_ _ _ new-state]
                      (remove-watch r k)
                      (a/>!! c new-state)))
