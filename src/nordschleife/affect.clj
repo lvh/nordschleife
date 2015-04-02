@@ -52,10 +52,14 @@
   [{compute :compute} state-ref setup event]
   (let [get-state #(block-until-updated state-ref)
         {desired :desired-state} event]
+    (info "Acquiescing" group-id)
     (loop [prev (get-state)
            curr (get-state)
            tries-left max-fruitless-tries
            total-tries 1]
+      (info "Acquiescing" group-id
+            "total tries" total-tries
+            "tries left" tries-left)
       (let [progress (measure-progress prev curr desired)
             {progress? :progress? done? :done?} progress
             ctx {:total-tries total-tries
