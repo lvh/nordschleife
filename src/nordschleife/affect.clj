@@ -66,16 +66,23 @@
                  :group (-> setup :group-config :name)
                  :event event}]
         (cond
-          done? (merge ctx {:acquiesced? true})
-          progress? (recur curr
-                           (get-state)
-                           max-fruitless-tries
-                           (inc total-tries))
-          (pos? tries-left) (recur curr
-                                   (get-state)
-                                   (dec tries-left)
-                                   (inc total-tries))
-          :default (merge ctx {:acquiesced? false}))))))
+          done? (do
+                  (info "Acquiesced!" group-id)
+                  (merge ctx {:acquiesced? true}))
+          progress? (do
+                      (info "Made progress" group-id)
+                      (recur curr
+                             (get-state)
+                             max-fruitless-tries
+                             (inc total-tries)))
+          (pos? tries-left) (do
+                              (info "No progress" group-id)
+                              (recur curr
+                                     (get-state)
+                                     (dec tries-left)
+                                     (inc total-tries)))
+          :default (do (info "Failed to acquiesce")
+                       (merge ctx {:acquiesced? false})))))))
 
 (def ^:private event-type->target-type
   "Translate the nordschleife event type into the one used by the
