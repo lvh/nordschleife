@@ -138,7 +138,9 @@
                     (catch AuthorizationException e
                       {:success? false
                        :reason (.getContent (.getCause e))}))]
-    {:event event :result result :group (-> setup :group-config :name)}))
+    {:event event
+     :result result
+     :group (-> setup :group-config :name)}))
 
 (defmethod affect :server-failures
   "Fake some server failures. Currently a no-op."
