@@ -109,6 +109,7 @@
    :scale-to ""})
 
 (def ^:private event-types-with-policies
+  "Which kinds of events have policies?"
   (into #{} (keys event-type->target-type)))
 
 (defn ^:private event->target
