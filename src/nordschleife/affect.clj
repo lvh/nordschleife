@@ -190,6 +190,7 @@
     (map affect evs)))
 
 (defn perform-scenarios
+  "Execute multiple scenarios with given parallelism."
   [services scenarios parallelism]
   (let [state-ref (atom nil)
         stop-updating (set-repeatedly 10000 gather state-ref)
