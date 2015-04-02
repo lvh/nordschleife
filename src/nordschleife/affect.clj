@@ -182,6 +182,7 @@
      events]))
 
 (defn perform-scenario
+  "Execute a single scenario."
   [services state-ref scenario]
   (info "Performing scenario" scenario)
   (let [[setup evs] (spy (prep-scenario services scenario))
