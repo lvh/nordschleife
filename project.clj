@@ -30,7 +30,8 @@
 
                  ;; Math (yay, rounding)
                  [org.clojure/math.numeric-tower "0.0.4"]]
-  :plugins [[lein-cljfmt "0.1.10"]]
+  :plugins [[lein-cljfmt "0.1.10"]
+            [lein-marginalia "0.8.0"]]
   :main ^:skip-aot nordschleife.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}})
