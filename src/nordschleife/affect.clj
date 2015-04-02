@@ -113,6 +113,10 @@
   (into #{} (keys event-type->target-type)))
 
 (defn ^:private event->target
+  "Given an event, what is the target of the event?
+
+  The target is jClouds-speak for the amount to scale by, be it
+  absolute, relative, or a relative percentage."
   [event]
   (let [sign (event-type->sign (:type event))]
     (str sign (:amount event))))
