@@ -36,6 +36,7 @@
     (a/<!! c)))
 
 (def max-fruitless-tries
+  "How many times do we accept that no progress has been made yet?"
   10)
 
 (defmulti affect
