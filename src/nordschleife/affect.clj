@@ -63,6 +63,8 @@
           :default (merge ctx {:acquiesced? false}))))))
 
 (def ^:private event-type->target-type
+  "Translate the nordschleife event type into the one used by the
+  jClouds Auto Scale library."
   {:scale-up as/INCREMENTAL
    :scale-down as/INCREMENTAL
 
