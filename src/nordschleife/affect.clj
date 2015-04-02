@@ -47,6 +47,7 @@
         t))))
 
 (defmethod affect :acquiesce
+  "Wait until acquiesced, assert convergence happened."
   [{compute :compute} state-ref setup event]
   (let [get-state #(block-until-updated state-ref)
         {desired :desired-state} event]
