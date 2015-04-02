@@ -15,10 +15,13 @@
   (let [should-close (atom false)]
     (a/thread
       (loop []
-        (reset! target (f))
+        (info "Will repeatedly set state" f)
+        (let [result (f)]
+          (info "Setting state" result)
+          (reset! target result))
         (a/<!! (a/timeout delay))
         (if @should-close
-          nil
+          (info "Done updating")
           (recur))))
     #(reset! should-close true)))
 
