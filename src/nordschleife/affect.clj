@@ -125,6 +125,7 @@
   (scale services state-ref setup event))
 
 (defmethod affect :server-failures
+  "Fake some server failures. Currently a no-op."
   [services state-ref setup event]
   {:event event})
 
