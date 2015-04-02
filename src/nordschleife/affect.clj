@@ -35,7 +35,13 @@
 (def max-fruitless-tries
   10)
 
-(defmulti affect (fn [_ _ _ event] (:type event)))
+(defmulti affect
+  "Apply a step."
+  (fn [_ _ _ event]
+    (let [t (:type event)]
+      (if (#{:scale-up :scale-down :scale-to} t)
+        :scale
+        t))))
 
 (defmethod affect :acquiesce
   [{compute :compute} state-ref setup event]
@@ -94,8 +100,8 @@
   (let [sign (event-type->sign (:type event))]
     (str sign (:amount event))))
 
-(defn ^:private scale
-  "Actually execute a scaling event."
+(defmethod affect :scale
+  "Execute a scaling event."
   [{auto-scale :auto-scale} _ setup event]
   (info "Scaling" ((juxt :type :amount) event))
   (let [api (as/policy-api auto-scale zone (.getId (:group setup)))
@@ -111,18 +117,6 @@
                       {:success? false
                        :reason (.getContent (.getCause e))}))]
     {:event event :result result :group (-> setup :group-config :name)}))
-
-(defmethod affect :scale-up
-  [services state-ref setup event]
-  (scale services state-ref setup event))
-
-(defmethod affect :scale-down
-  [services state-ref setup event]
-  (scale services state-ref setup event))
-
-(defmethod affect :scale-to
-  [services state-ref setup event]
-  (scale services state-ref setup event))
 
 (defmethod affect :server-failures
   "Fake some server failures. Currently a no-op."
