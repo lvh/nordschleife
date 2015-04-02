@@ -50,7 +50,8 @@
 (defmethod affect :acquiesce
   "Wait until acquiesced, assert convergence happened."
   [{compute :compute} state-ref setup event]
-  (let [get-state #(block-until-updated state-ref)
+  (let [group-id (.getId (:group setup))
+        get-state #(block-until-updated state-ref)
         {desired :desired-state} event]
     (info "Acquiescing" group-id)
     (loop [prev (get-state)
