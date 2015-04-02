@@ -125,7 +125,8 @@
   "Execute a scaling event."
   [{auto-scale :auto-scale} _ setup event]
   (info "Scaling" ((juxt :type :amount) event))
-  (let [api (as/policy-api auto-scale zone (.getId (:group setup)))
+  (let [group (:group setup)
+        api (as/policy-api auto-scale zone (.getId group))
         key [(event-type->target-type (:type event))
              (event->target event)]
         policy ((:policy-index setup) key)
