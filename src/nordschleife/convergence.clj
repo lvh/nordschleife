@@ -15,7 +15,8 @@
 (defn ^:private live
   "Gets the live servers in a state."
   [state]
-  (filter (some-fn running? pending?) (:servers state)))
+  (let [live? (some-fn running? pending?)]
+    (filter live? (:servers state))))
 
 (defn measure-progress
   "Measures progress between states towards the desired state."
