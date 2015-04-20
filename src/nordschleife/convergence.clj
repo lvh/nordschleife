@@ -8,6 +8,7 @@
   `(. org.jclouds.compute.domain.NodeMetadata$Status ~status))
 
 (defn ^:private abs
+  "Gets the absolute value of a number."
   [n]
   (max n (- n)))
 
