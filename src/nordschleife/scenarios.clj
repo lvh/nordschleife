@@ -146,7 +146,7 @@
   (partial gen/sample scenario-gen))
 
 (defn ^:private round-away-from-zero
-  "Round the way Auto Scale rounds."
+  "Round away from zero, the way Auto Scale rounds."
   [x]
   (let [round (if (pos? x) math/ceil math/floor)]
     (round x)))
