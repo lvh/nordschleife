@@ -18,8 +18,10 @@
 (def random-safe-str-gen
   "Generates a random, 12-char alphanumeric identifier.
 
-  Doesn't shrink; working under the assumption that identifier names
-  don't affect failure modes."
+  no-shrink tells test.check not to try and minimize this when it
+  finds a failing test case. We're assuming that the name of the
+  scaling group or server does not contribute to the failure, so it's
+  pointless to find the shortest string that still causes the failure."
   (gen/no-shrink (gen'/string-from-regex #"[a-zA-Z0-9]{12}")))
 
 (def launch-config-gen
@@ -36,11 +38,6 @@
 
 (def group-config-gen
   "A generator for group configs."
-  ;; no-shrink tells test.check not to try and minimize this when it
-  ;; finds a failing test case. We're assuming that the name of the
-  ;; scaling group does not contribute to the failure, so it's
-  ;; pointless to find the shortest string that still causes the
-  ;; failure.
   (gen'/for [random-name random-safe-str-gen
              limits (gen/elements [{:cooldown 0
                                     :min-entities 0
