@@ -111,7 +111,9 @@
     evs))
 
 (def clean-events
-  (comp coalesce-acquiesces chop-head-acquiesce add-tail-acquiesce))
+  (comp chop-head-acquiesce
+        coalesce-acquiesces
+        add-tail-acquiesce))
 
 (def events-gen
   "A generator for sequences of scenario events, with some pointless
