@@ -11,6 +11,12 @@
 (def public-net
   "The Rackspace identifier for the public internet."
   "00000000-0000-0000-0000-000000000000")
+(def random-safe-str-gen
+  "Generates a random, 12-char alphanumeric identifier.
+
+  Doesn't shrink; working under the assumption that identifier names
+  don't affect failure modes."
+  (gen/no-shrink (gen'/string-from-regex #"[a-zA-Z0-9]{12}")))
 
 (def launch-config-gen
   "A generator for launch configurations."
@@ -31,13 +37,13 @@
   ;; scaling group does not contribute to the failure, so it's
   ;; pointless to find the shortest string that still causes the
   ;; failure.
-  (gen'/for [random-str (gen/no-shrink (gen'/string-from-regex #"[a-zA-Z0-9]{12}"))
+  (gen'/for [random-name random-safe-str-gen
              limits (gen/elements [{:cooldown 0
                                     :min-entities 0
                                     :max-entities 10
                                     :metadata {}}])]
     (-> limits
-        (assoc :name (str "nordschleife test group " random-str)))))
+        (assoc :name (str "nordschleife test group " random-name)))))
 
 (def setup-gen
   "A generator for group setups."
