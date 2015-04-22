@@ -25,7 +25,9 @@
       (is (= from-map test-group-config)))))
 
 (def test-launch-config
+  "A simple launch configuration."
   (.. (LaunchConfiguration/builder)
+      (type LAUNCH_SERVER)
       (loadBalancers [])
       (networks [])
       (personalities [])
