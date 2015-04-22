@@ -87,13 +87,13 @@
   (gen/frequency (into [[10 (gen/return {:type :acquiesce})]]
                        weighted-events)))
 
-(defn add-tail-acquiesce
+(defn ^:private add-tail-acquiesce
   "At the end of a scenario, we should *always* acquiesce to see if
   convergence eventually does the right thing."
   [evs]
   (conj evs {:type :acquiesce}))
 
-(defn coalesce-acquiesces
+(defn ^:private coalesce-acquiesces
   "If multiple :acquiesce events occur next to each other, they should
   merge into one, since that is nonsensical by definition."
   [evs]
@@ -103,7 +103,7 @@
           []
           evs))
 
-(defn chop-head-acquiesce
+(defn ^:private chop-head-acquiesce
   "Acquiescing at the start is meaningless, so don't do it."
   [evs]
   (if (= (:type (first evs)) :acquiesce)

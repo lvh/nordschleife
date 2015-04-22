@@ -4,6 +4,10 @@
             [clojure.test :refer :all]
             [nordschleife.scenarios :refer :all]))
 
+;; Subvert ^:private fns
+(def coalesce-acquiesces
+  @#'nordschleife.scenarios/coalesce-acquiesces)
+
 (deftest coalesce-acquiesces-tests
   (testing "no adjacent coalesces"
     (are [evs] (= (coalesce-acquiesces evs) evs)
