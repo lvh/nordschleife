@@ -42,9 +42,10 @@
              limits (gen/elements [{:cooldown 0
                                     :min-entities 0
                                     :max-entities 10
-                                    :metadata {}}])]
+                                    :metadata {}}])
+             :let [name (str "nordschleife test group " random-name)]]
     (-> limits
-        (assoc :name (str "nordschleife test group " random-name)))))
+        (assoc :name name))))
 
 (def setup-gen
   "A generator for group setups."
