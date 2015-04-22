@@ -19,7 +19,11 @@
     (filter live? (:servers state))))
 
 (defn measure-progress
-  "Measures progress between states towards the desired state."
+  "Measures progress between states towards the desired state.
+
+  This will look at all servers in the given state; if you'd like to
+  check multiple scaling groups concurrently, filter before passing to
+  this function."
   [prev-state curr-state desired-state]
   (let [prev-cap (count (live prev-state))
         curr-cap (count (live curr-state))
