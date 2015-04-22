@@ -116,7 +116,9 @@
 (def events-gen
   "A generator for sequences of scenario events, with some pointless
   interactions removed."
-  (gen/fmap clean-events (gen/vector event-gen 4 10)))
+  (->> (gen/vector event-gen 4 10)
+       (gen/fmap clean-events)
+       (gen/such-that #(> (count %) 1))))
 
 (defn ^:private clamp
   "Clamps a number to the given [low, high] interval (inclusive)."
