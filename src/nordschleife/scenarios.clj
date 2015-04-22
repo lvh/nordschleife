@@ -107,7 +107,7 @@
   "Acquiescing at the start is meaningless, so don't do it."
   [evs]
   (if (= (:type (first evs)) :acquiesce)
-    (rest evs)
+    (vec (rest evs))
     evs))
 
 (def clean-events
