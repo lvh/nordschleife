@@ -45,7 +45,7 @@
           {:load-balancers []
            :networks [service-net]
            :personalities []
-           :server-name "nordschleife test server "
+           :server-name (str "server for " (-> setup :group-config :name) " ")
            :server-image-ref debian-base
            :server-flavor-ref "general1-1"
            :server-disk-config "AUTO"
@@ -55,10 +55,10 @@
    (is (<= 0 (-> setup :group-config :cooldown) 10))
 
    ;; The group name is valid.
-   (is (re-find #"nordschleife test group [a-zA-Z0-9]{12}"
+   (is (re-find #"nordschleife group [a-zA-Z0-9]{12}"
                 (-> setup :group-config :name)))
 
-   ;; The group min and max are valid.
+   ;; The group min and max
    (let [{{min :min-entities max :max-entities} :group-config} setup]
      (is (<= 0 min max 10)))
 
