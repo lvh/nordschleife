@@ -66,7 +66,7 @@
    (is (not-any? #(apply = :acquiesce %)
                  (partition 2 1 (map :type events))))
 
-   ;; Scenarios can't start by acquiescing.
+   ;; Scenarios never start by acquiescing.
    (is (not= (:type (first events)) :acquiesce))
 
    ;; Scenarios always end by acquiescing.
