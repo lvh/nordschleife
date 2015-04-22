@@ -36,7 +36,10 @@
                private-addrs ["10.11.12.13"]
                credentials nil
                hostname name]]
-     (NodeMetadataImpl. provider-id name id location uri user-metadata tags group hardware image-id os status backend-status login-port public-addrs private-addrs credentials hostname))))
+     (NodeMetadataImpl. provider-id name id location uri user-metadata tags
+                        group hardware image-id os status backend-status
+                        login-port public-addrs private-addrs credentials
+                        hostname))))
 
 (deftest measure-progress-tests
   (testing "If convergence has been attained, progress has been made, and we're done."
