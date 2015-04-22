@@ -24,33 +24,34 @@
   pointless to find the shortest string that still causes the failure."
   (gen/no-shrink (gen'/string-from-regex #"[a-zA-Z0-9]{12}")))
 
-(def launch-config-gen
-  "A generator for launch configurations."
-  (gen/elements
-   [{:load-balancers []
-     :networks [service-net]
-     :personalities []
-     :server-name "nordschleife test server "
-     :server-image-ref debian-base
-     :server-flavor-ref "general1-1"
-     :server-disk-config "AUTO"
-     :server-metadata {}}]))
+(defn ^:private launch-config-gen
+  "Builds a generator for launch configurations."
+  [group-name]
+  (let [name (str "server for " group-name " ")]
+    (gen/elements
+     [{:load-balancers []
+       :networks [service-net]
+       :personalities []
+       :server-name name
+       :server-image-ref debian-base
+       :server-flavor-ref "general1-1"
+       :server-disk-config "AUTO"
+       :server-metadata {}}])))
 
-(def group-config-gen
+(def ^:private group-config-gen
   "A generator for group configs."
   (gen'/for [random-name random-safe-str-gen
              limits (gen/elements [{:cooldown 0
                                     :min-entities 0
                                     :max-entities 10
                                     :metadata {}}])
-             :let [name (str "nordschleife test group " random-name)]]
-    (-> limits
-        (assoc :name name))))
+             :let [name (str "nordschleife group " random-name)]]
+    (assoc limits :name name)))
 
 (def ^:private setup-gen
   "A generator for group setups."
   (gen'/for [group-config group-config-gen
-             launch-config launch-config-gen]
+             launch-config (launch-config-gen (:name group-config))]
     {:group-config group-config
      :launch-config launch-config}))
 
