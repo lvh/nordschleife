@@ -35,39 +35,40 @@
   1000
   (prop/for-all
    [[setup events] scenario-gen]
-
    ;; The launch configuration is always the fixed, known-good one.
    ;; Note that jClouds requires more args than Auto Scale does.
-   (= (:launch-config setup)
-      {:load-balancers []
-       :networks []
-       :personalities []
-       :server-name "nordschleife test server "
-       :server-image-ref "0938b7e9-ba56-4af2-a9e6-52c47d931d22" ;; Debian 7
-       :server-flavor-ref "general1-1"
-       :server-metadata {}})
+   (is (= (:launch-config setup)
+          {:load-balancers []
+           :networks [service-net]
+           :personalities []
+           :server-name "nordschleife test server "
+           :server-image-ref debian-base
+           :server-flavor-ref "general1-1"
+           :server-disk-config "AUTO"
+           :server-metadata {}}))
 
    ;; The group cooldown is reasonable.
-   (<= 0 (-> setup :group-config :cooldown) 10)
+   (is (<= 0 (-> setup :group-config :cooldown) 10))
 
    ;; The group name is valid.
-   (re-find #"nordschleife test group [a-zA-Z0-9]{12}"
-            (-> setup :group-config :name))
+   (is (re-find #"nordschleife test group [a-zA-Z0-9]{12}"
+                (-> setup :group-config :name)))
 
    ;; The group min and max are valid.
    (let [{{min :min-entities max :max-entities} :group-config} setup]
-     (<= 0 min max 10))
+     (is (<= 0 min max 10)))
 
    ;; There are never two acquiesces after each other.
-   (not-any? #(apply = :acquiesce %)
-             (partition 2 1 (map :type events)))
+   (is (not-any? #(apply = :acquiesce %)
+                 (partition 2 1 (map :type events))))
 
    ;; Scenarios can't start by acquiescing.
-   (not= (:type (first events)) :acquiesce)
+   (is (not= (:type (first events)) :acquiesce))
 
    ;; Scenarios always end by acquiescing.
-   (= (:type (last events)) :acquiesce)
+   (is (= (:type (last events)) :acquiesce))
 
    ;; All events know how much capacity they're expecting.
    (let [{{min :min-entities max :max-entities} :group-config} setup]
-     (every? (fn [ev] (<= min (-> ev :desired-state :capacity) max)) events))))
+     (is (every? (fn [ev] (<= min (-> ev :desired-state :capacity) max)) events))))
+  )
