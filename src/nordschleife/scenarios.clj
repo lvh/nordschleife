@@ -15,7 +15,7 @@
   "The Rackspace identifier for the Debian 7 base image."
   "0938b7e9-ba56-4af2-a9e6-52c47d931d22")
 
-(def random-safe-str-gen
+(def ^:private random-safe-str-gen
   "Generates a random, 12-char alphanumeric identifier.
 
   no-shrink tells test.check not to try and minimize this when it
@@ -47,7 +47,7 @@
     (-> limits
         (assoc :name name))))
 
-(def setup-gen
+(def ^:private setup-gen
   "A generator for group setups."
   (gen'/for [group-config group-config-gen
              launch-config launch-config-gen]
@@ -62,7 +62,7 @@
    (for [[freq const] (seq weights-and-consts)]
      [freq (gen/return const)])))
 
-(def weighted-events
+(def ^:private weighted-events
   (for [[w t pairs] [[6 :scale-up [[10 1]
                                    [2 2]
                                    [1 3]]]
@@ -83,7 +83,7 @@
     [w (gen'/for [n (weighted-consts pairs)]
          {:type t :amount n})]))
 
-(def event-gen
+(def ^:private event-gen
   "A generator for scenario events."
   (gen/frequency (into [[10 (gen/return {:type :acquiesce})]]
                        weighted-events)))
@@ -111,12 +111,12 @@
     (vec (rest evs))
     evs))
 
-(def clean-events
+(def ^:private clean-events
   (comp chop-head-acquiesce
         coalesce-acquiesces
         add-tail-acquiesce))
 
-(def events-gen
+(def ^:private events-gen
   "A generator for sequences of scenario events, with some pointless
   interactions removed."
   (->> (gen/vector event-gen 4 10)
