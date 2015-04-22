@@ -74,5 +74,4 @@
 
    ;; All events know how much capacity they're expecting.
    (let [{{min :min-entities max :max-entities} :group-config} setup]
-     (is (every? (fn [ev] (<= min (-> ev :desired-state :capacity) max)) events))))
-  )
+     (is (every? (fn [ev] (<= min (-> ev :desired-state :capacity) max)) events)))))
