@@ -12,7 +12,7 @@
   "The Rackspace identifier for the public internet."
   "00000000-0000-0000-0000-000000000000")
 (def debian-base
-  "The Rackspace identifier for the Debian base image."
+  "The Rackspace identifier for the Debian 7 base image."
   "0938b7e9-ba56-4af2-a9e6-52c47d931d22")
 
 (def random-safe-str-gen
