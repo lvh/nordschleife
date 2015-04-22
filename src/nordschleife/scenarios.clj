@@ -11,6 +11,10 @@
 (def public-net
   "The Rackspace identifier for the public internet."
   "00000000-0000-0000-0000-000000000000")
+(def debian-base
+  "The Rackspace identifier for the Debian base image."
+  "0938b7e9-ba56-4af2-a9e6-52c47d931d22")
+
 (def random-safe-str-gen
   "Generates a random, 12-char alphanumeric identifier.
 
@@ -25,7 +29,7 @@
      :networks [service-net]
      :personalities []
      :server-name "nordschleife test server "
-     :server-image-ref "0938b7e9-ba56-4af2-a9e6-52c47d931d22"
+     :server-image-ref debian-base
      :server-flavor-ref "general1-1"
      :server-disk-config "AUTO"
      :server-metadata {}}]))
