@@ -1,5 +1,5 @@
 (ns nordschleife.convergence
-  (:require [com.palletops.jclouds.compute2 :refer [hostname]]))
+  (:require [com.palletops.jclouds.compute2 :refer [hostname running? pending?]]))
 
 (defn ^:private abs
   "Gets the absolute value of a number."
