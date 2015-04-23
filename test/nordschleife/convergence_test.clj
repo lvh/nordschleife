@@ -42,37 +42,37 @@
                        hostname)))
 
 (deftest measure-progress-tests
-  (testing "If convergence has been attained, progress has been made, and we're done."
+  (testing "reaching convergence"
     (let [prev-state {:servers (create-servers 1)}
           curr-state {:servers (create-servers 2)}
           desired-state {:capacity 2}]
       (is (= (measure-progress prev-state curr-state desired-state)
              {:progress? true :done? true}))))
-  (testing "If the capacity moves closer to the desired when scaling up, progress has been made."
+  (testing "progress while scaling up"
     (let [prev-state {:servers (create-servers 2)}
           curr-state {:servers (create-servers 3)}
           desired-state {:capacity 5}]
       (is (= (measure-progress prev-state curr-state desired-state)
              {:progress? true :amount 1}))))
-  (testing "If the capacity moves closer the desired when scaling down, progress has been made."
+  (testing "progress while scaling down"
     (let [prev-state {:servers (create-servers 3)}
           curr-state {:servers (create-servers 2)}
           desired-state {:capacity 1}]
       (is (= (measure-progress prev-state curr-state desired-state)
              {:progress? true :amount 1}))))
-  (testing "When overshooting the desired capacity (group was below desired, and is now above desired), no progress was made."
+  (testing "overshoot (group was below desired, and is now above it)"
     (let [prev-state {:servers (create-servers 4)}
           curr-state {:servers (create-servers 6)}
           desired-state {:capacity 5}]
       (is (= (measure-progress prev-state curr-state desired-state)
              {:progress? false :reason "overshoot"}))))
-  (testing "When undershooting the desired capacity (group was above desired, and is now below desired), no progress was made."
+  (testing "undershoot (group was above desired, and is now below it)"
     (let [prev-state {:servers (create-servers 6)}
           curr-state {:servers (create-servers 4)}
           desired-state {:capacity 5}]
       (is (= (measure-progress prev-state curr-state desired-state)
              {:progress? false :reason "undershoot"}))))
-  (testing "When some servers go from being pending to being errored, no progress was made."
+  (testing "servers going pending => error"
     (let [working-servers (create-servers 2)
           prev-state {:servers (concat working-servers
                                        (create-servers 2 :status PENDING))}
@@ -81,14 +81,14 @@
           desired-state {:capacity 5}]
       (is (= (measure-progress prev-state curr-state desired-state)
              {:progress? false}))))
-  (testing "When some servers go from build to error, no progress was made. That works correctly even if some of the errored machines get reaped in the mean while."
+  (testing "servers going pending -> error, with some being reaped"
     (let [prev-state {:servers (create-servers 3 :status PENDING)}
           curr-state {:servers (concat (create-servers 1 :status RUNNING)
                                        (create-servers 1 :status ERROR))}
           desired-state {:capacity 5}]
       (is (= (measure-progress prev-state curr-state desired-state)
              {:progress? false}))))
-  (testing "Errored servers are removed; no progress is made."
+  (testing "servers in error are reaped => no progress"
     (let [prev-state {:servers (concat (create-servers 1 :status RUNNING)
                                        (create-servers 3 :status ERROR))}
           curr-state {:servers (create-servers 1 :status RUNNING)}
