@@ -1,11 +1,5 @@
 (ns nordschleife.convergence
-  (:require [com.palletops.jclouds.compute2 :refer [hostname]])
-  (:import [org.jclouds.compute.domain.internal NodeMetadataImpl]
-           [org.jclouds.compute.domain NodeMetadata]))
-
-(defmacro status-const
-  [status]
-  `(. org.jclouds.compute.domain.NodeMetadata$Status ~status))
+  (:require [com.palletops.jclouds.compute2 :refer [hostname]]))
 
 (defn ^:private abs
   "Gets the absolute value of a number."

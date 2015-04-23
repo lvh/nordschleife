@@ -3,6 +3,10 @@
             [clojure.test :refer :all])
   (:import [org.jclouds.compute.domain.internal NodeMetadataImpl]))
 
+(defmacro status-const
+  [status]
+  `(. org.jclouds.compute.domain.NodeMetadata$Status ~status))
+
 (def PENDING
   (status-const PENDING))
 
@@ -110,3 +114,8 @@
           desired-state {:capacity 5}]
       (is (= (measure-progress prev-state curr-state desired-state)
              {:progress? false})))))
+
+(defn merge-states
+  [& states]
+  (into (empty (first states))
+        (map #(mapcat % states) (keys (first states)))))
