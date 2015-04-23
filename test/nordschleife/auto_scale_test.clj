@@ -24,6 +24,10 @@
                                   :metadata {"xyzzy" "iddqd"}})]
       (is (= from-map test-group-config)))))
 
+(deftest group-name-tests
+  (is (= (group-name test-group-config)
+         "my-group")))
+
 (def test-launch-config
   "A simple launch configuration."
   (.. (LaunchConfiguration/builder)
