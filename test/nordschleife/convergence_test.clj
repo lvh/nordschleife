@@ -15,8 +15,8 @@
 (defn ^:private create-servers
   "Creates some dummy servers for testing."
   ([n]
-   (create-servers n RUNNING))
-  ([n status]
+   (create-servers n {:status RUNNING}))
+  ([n {status :status}]
    (for [i (range n)
          :let [name (str "nordschleife-" i)
                provider-id "nordschleife"
@@ -74,22 +74,22 @@
              {:progress? false :reason "undershoot"}))))
   (testing "When some servers go from being pending to being errored, no progress was made."
     (let [working-servers (create-servers 2)
-          prev-state {:servers (concat working-servers (create-servers 2 PENDING))}
-          curr-state {:servers (concat working-servers (create-servers 2 ERROR))}
+          prev-state {:servers (concat working-servers (create-servers 2 {:status PENDING}))}
+          curr-state {:servers (concat working-servers (create-servers 2 {:status ERROR}))}
           desired-state {:capacity 5}]
       (is (= (measure-progress prev-state curr-state desired-state)
              {:progress? false}))))
   (testing "When some servers go from build to error, no progress was made. That works correctly even if some of the errored machines get reaped in the mean while."
-    (let [prev-state {:servers (create-servers 3 PENDING)}
-          curr-state {:servers (concat (create-servers 1 RUNNING)
-                                       (create-servers 1 ERROR))}
+    (let [prev-state {:servers (create-servers 3 {:status PENDING})}
+          curr-state {:servers (concat (create-servers 1 {:status RUNNING})
+                                       (create-servers 1 {:status ERROR}))}
           desired-state {:capacity 5}]
       (is (= (measure-progress prev-state curr-state desired-state)
              {:progress? false}))))
   (testing "Errored servers are removed; no progress is made."
-    (let [prev-state {:servers (concat (create-servers 1 RUNNING)
-                                       (create-servers 3 ERROR))}
-          curr-state {:servers (create-servers 1 RUNNING)}
+    (let [prev-state {:servers (concat (create-servers 1 {:status RUNNING})
+                                       (create-servers 3 {:status ERROR}))}
+          curr-state {:servers (create-servers 1 {:status RUNNING})}
           desired-state {:capacity 5}]
       (is (= (measure-progress prev-state curr-state desired-state)
              {:progress? false})))))
