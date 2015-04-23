@@ -144,7 +144,7 @@
                                 :scale-down (- prev-cap (:amount event))
                                 prev-cap)
                      this-cap (clamp this-cap min-cap max-cap)
-                     event (assoc event :desired-state {:capacity this-cap})]
+                     event (assoc-in event [:desired-state :capacity] this-cap)]
                  (conj events event)))
              []
              evs)]
