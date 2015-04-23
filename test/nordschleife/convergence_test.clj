@@ -41,6 +41,21 @@
                        login-port public-addrs private-addrs credentials
                        hostname)))
 
+(deftest filter-group-tests
+  (let [create-some (fn [group-name]
+                      (let [base-name (str "server for " group-name)
+                            create-some (fn [status]
+                                          (create-servers 5
+                                                          :base-name base-name
+                                                          :status status))]
+                        (mapcat create-some [RUNNING PENDING ERROR])))
+        [xyzzy-servers iddqd-servers] (map create-some ["xyzzy" "iddqd"])
+        all-servers (concat xyzzy-servers iddqd-servers)]
+    (is (= (filter-group "xyzzy" {:servers all-servers})
+           {:servers xyzzy-servers}))
+    (is (= (filter-group "iddqd" {:servers all-servers})
+           {:servers iddqd-servers}))))
+
 (deftest measure-progress-tests
   (testing "reaching convergence"
     (let [prev-state {:servers (create-servers 1)}
