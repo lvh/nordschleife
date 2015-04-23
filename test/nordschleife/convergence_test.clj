@@ -16,10 +16,13 @@
   "Creates some dummy servers for testing."
   ([n]
    (create-servers n {:status RUNNING}))
-  ([n {status :status}]
+  ([n {status :status
+       base-name :base-name
+       :or {:status RUNNING
+            :base-name "nordschleife"}}]
    (for [i (range n)
-         :let [name (str "nordschleife-" i)
-               provider-id "nordschleife"
+         :let [name (str base-name "-" i)
+               provider-id base-name
                name name
                id (str i)
                location nil
