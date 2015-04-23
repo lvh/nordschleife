@@ -1,5 +1,5 @@
 (ns nordschleife.convergence
-  (:require [com.palletops.jclouds.compute2 :refer :all])
+  (:require [com.palletops.jclouds.compute2 :refer [hostname]])
   (:import [org.jclouds.compute.domain.internal NodeMetadataImpl]
            [org.jclouds.compute.domain NodeMetadata]))
 
@@ -17,6 +17,12 @@
   [state]
   (let [live? (some-fn running? pending?)]
     (filter live? (:servers state))))
+
+(defn filter-group
+  "Filter state items that belong to group with given name."
+  [group-name state]
+  (let [has-group-name? (fn [node] (.contains (hostname node) group-name))]
+    (update state :servers (partial filter has-group-name?))))
 
 (defn measure-progress
   "Measures progress between states towards the desired state.
