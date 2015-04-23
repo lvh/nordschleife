@@ -27,7 +27,7 @@
 (defn ^:private launch-config-gen
   "Builds a generator for launch configurations."
   [group-name]
-  (let [name (str "server for " group-name " ")]
+  (let [name (str "server for " group-name)]
     (gen/elements
      [{:load-balancers []
        :networks [service-net]
