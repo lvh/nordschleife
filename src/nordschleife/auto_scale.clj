@@ -86,6 +86,13 @@
   [gc]
   (pojo-wrapper GroupConfiguration gc))
 
+(defn group-name
+  "Gets the name of a group."
+  [group]
+  (.. group
+      (getGroupConfiguration)
+      (getName)))
+
 (def LAUNCH_SERVER
   LaunchConfiguration$LaunchConfigurationType/LAUNCH_SERVER)
 
