@@ -45,7 +45,7 @@
           {:load-balancers []
            :networks [service-net]
            :personalities []
-           :server-name (str "server for " (-> setup :group-config :name) " ")
+           :server-name (str "server for " (-> setup :group-config :name))
            :server-image-ref debian-base
            :server-flavor-ref "general1-1"
            :server-disk-config "AUTO"
