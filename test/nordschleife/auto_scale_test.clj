@@ -1,7 +1,10 @@
 (ns nordschleife.auto-scale-test
   (:require [nordschleife.auto-scale :refer :all :as as]
             [clojure.test :refer :all])
-  (:import [org.jclouds.rackspace.autoscale.v1.domain GroupConfiguration LaunchConfiguration CreateScalingPolicy]))
+  (:import [org.jclouds.rackspace.autoscale.v1.domain
+            GroupConfiguration
+            LaunchConfiguration
+            CreateScalingPolicy]))
 
 (def test-group-config
   (.. (GroupConfiguration/builder)
