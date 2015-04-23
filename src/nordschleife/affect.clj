@@ -3,87 +3,13 @@
             [nordschleife.auto-scale :as as]
             [nordschleife.gathering :refer [gather]]
             [nordschleife.convergence :refer [measure-progress]]
-            [taoensso.timbre :refer [debug info spy]])
+            [taoensso.timbre :refer [debug info spy]]
+            [manifold.stream :as s])
   (:import [org.jclouds.http HttpResponseException]
-           [org.jclouds.rest AuthorizationException]))
+           [org.jclouds.rest AuthorizationException]
+           [java.util.concurrent Executors]))
 
 (def zone "ORD")
-
-(defn set-repeatedly
-  "Sets the target to (f) repeatedly."
-  [delay f target]
-  (let [should-close (atom false)]
-    (a/thread
-      (loop []
-        (info "Will repeatedly set state" f)
-        (let [result (f)]
-          (info "Setting state" result)
-          (reset! target result))
-        (a/<!! (a/timeout delay))
-        (if @should-close
-          (info "Done updating")
-          (recur))))
-    #(reset! should-close true)))
-
-(defn ^:private block-until-updated
-  "Blocks until given reference type is updated, returning the new value."
-  [r]
-  (let [c (a/chan)
-        k (gensym)]
-    (add-watch r k (fn [_ _ _ new-state]
-                     (remove-watch r k)
-                     (a/>!! c new-state)))
-    (a/<!! c)))
-
-(def max-fruitless-tries
-  "How many times do we accept that no progress has been made yet?"
-  10)
-
-(defmulti affect
-  "Apply a step."
-  (fn [_ _ _ event]
-    (let [t (:type event)]
-      (if (#{:scale-up :scale-down :scale-to} t)
-        :scale
-        t))))
-
-(defmethod affect :acquiesce
-  "Wait until acquiesced, assert convergence happened."
-  [{compute :compute} state-ref setup event]
-  (let [group-id (.getId (:group setup))
-        get-state #(block-until-updated state-ref)
-        {desired :desired-state} event]
-    (info "Acquiescing" group-id)
-    (loop [prev (get-state)
-           curr (get-state)
-           tries-left max-fruitless-tries
-           total-tries 1]
-      (info "Acquiescing" group-id
-            "total tries" total-tries
-            "tries left" tries-left)
-      (let [progress (measure-progress prev curr desired)
-            {progress? :progress? done? :done?} progress
-            ctx {:total-tries total-tries
-                 :group (-> setup :group-config :name)
-                 :event event}]
-        (cond
-          done? (do
-                  (info "Acquiesced!" group-id)
-                  (merge ctx {:acquiesced? true}))
-          progress? (do
-                      (info "Made progress" group-id)
-                      (recur curr
-                             (get-state)
-                             max-fruitless-tries
-                             (inc total-tries)))
-          (pos? tries-left) (do
-                              (info "No progress" group-id)
-                              (recur curr
-                                     (get-state)
-                                     (dec tries-left)
-                                     (inc total-tries)))
-          :default (do (info "Failed to acquiesce")
-                       (merge ctx {:acquiesced? false})))))))
 
 (def ^:private event-type->target-type
   "Translate the nordschleife event type into the one used by the
@@ -122,9 +48,36 @@
   (let [sign (event-type->sign (:type event))]
     (str sign (:amount event))))
 
+(def affect nil)
+(defmulti affect
+  "Apply a step."
+  (fn [_ _ event]
+    (let [t (:type event)]
+      (if (#{:scale-up :scale-down :scale-to} t)
+        :scale
+        t))))
+
+(def max-tries
+  "How many times do we accept a lack of process?"
+  10)
+
+(defmethod affect :acquiesce
+  [{state-stream :state-stream}
+   {{name :name} :group-config}
+   {desired :desired-state :as event}]
+  (info "Acquiescing" name)
+  (let [measure (fn [[prev curr]]
+                  (measure-progress prev curr desired))]
+    (->> state-stream
+         (s/stream->seq)
+         (take max-tries)
+         (partition 2 1)
+         (map measure)
+         (filter :progress?)
+         (assoc {:event event :group name} :result))))
+
 (defmethod affect :scale
-  "Execute a scaling event."
-  [{auto-scale :auto-scale} _ setup event]
+  [{auto-scale :auto-scale} setup event]
   (info "Scaling" ((juxt :type :amount) event))
   (let [group (:group setup)
         api (as/policy-api auto-scale zone (.getId group))
@@ -144,8 +97,7 @@
      :group (-> setup :group-config :name)}))
 
 (defmethod affect :server-failures
-  "Fake some server failures. Currently a no-op."
-  [services state-ref setup event]
+  [services setup event]
   {:event event})
 
 (defn ^:private required-policies
@@ -176,7 +128,8 @@
         group (as/create-group api gc lc policies)
         created-policies (as/get-policies group)
         policy-idx (into {} (map (fn [policy]
-                                   [[(.getTargetType policy) (.getTarget policy)]
+                                   [[(.getTargetType policy)
+                                     (.getTarget policy)]
                                     policy])
                                  created-policies))]
     [(merge setup {:group group :policy-index policy-idx})
@@ -184,23 +137,22 @@
 
 (defn perform-scenario
   "Execute a single scenario."
-  [services state-ref scenario]
+  [services scenario]
   (info "Performing scenario" scenario)
   (let [[setup evs] (spy (prep-scenario services scenario))
-        affect (partial affect services state-ref setup)]
+        do-step (fn [event] (assoc (affect services setup event)
+                                   :completion-time ))]
     (map affect evs)))
 
 (defn perform-scenarios
   "Execute multiple scenarios with given parallelism."
   [services scenarios parallelism]
-  (let [state-ref (atom nil)
-        stop-updating (set-repeatedly 10000 gather state-ref)
-        perform (partial perform-scenario services state-ref)
-        in (a/to-chan scenarios)
-        xform (map perform)
+  (let [state-stream (s/periodically 10000 #(gather services))
+        services (assoc services :state-stream state-stream)
+        perform (partial perform-scenario services)
         out (a/chan)]
-    (a/pipeline-blocking parallelism out xform in)
+    (a/pipeline-blocking parallelism out (map perform) (a/to-chan scenarios))
     (let [res (a/<!! (a/into [] out))]
-      (stop-updating)
-      (a/close! out)
+      (info "Received all outputs, closing state stream")
+      (s/close! state-stream)
       res)))
