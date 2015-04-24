@@ -161,3 +161,9 @@
         launch-config' (launch-config launch-config')
         policies (map scaling-policy policies)]
     (.create group-api group-config' launch-config' policies)))
+
+(defn delete-group
+  "Deletes a scaling group."
+  [#^GroupApi group-api #^Group group]
+  (let [group-id (.getId group)]
+    (.delete group-api group-id)))
