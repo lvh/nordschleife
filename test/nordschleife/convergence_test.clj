@@ -19,7 +19,7 @@
 (defn ^:private create-servers
   "Creates some dummy servers for testing."
   ([n]
-   (create-servers n {}))
+   (create-servers n nil))
   ([n {:keys [status base-name]
        :or {status RUNNING
             base-name "nordschleife"}}]
