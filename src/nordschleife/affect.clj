@@ -122,20 +122,19 @@
 
   Returns the modified scenario, where the setup contains the
   necessary policy ids."
-  [{auto-scale :auto-scale} scenario]
+  [{auto-scale :auto-scale} [setup events]]
   (let [policies (required-policies scenario)
-        api (as/group-api auto-scale zone)
-        [setup events] scenario
-        [gc lc] ((juxt :group-config :launch-config) setup)
-        group (as/create-group api gc lc policies)
+        group (as/create-group (as/group-api auto-scale zone)
+                               (:group-config setup)
+                               (:launch-config setup)
+                               policies)
         created-policies (as/get-policies group)
-        policy-idx (into {} (map (fn [policy]
-                                   [[(.getTargetType policy)
-                                     (.getTarget policy)]
-                                    policy])
-                                 created-policies))]
-    [(merge setup {:group group :policy-index policy-idx})
-     events]))
+        policy-idx (->> created-policies
+                        (map (fn [policy]
+                                [[(.getTargetType policy) (.getTarget policy)]
+                                 policy]))
+                        (into {}))]
+    [(merge setup {:group group :policy-index policy-idx}) events]))
 
 (defn perform-scenario
   "Execute a single scenario."
