@@ -156,7 +156,7 @@
 (defn create-group
   "Create a scaling group."
   [#^GroupApi group-api #^GroupConfiguration group-config'
-  #^LaunchConfiguration launch-config' policies]
+   #^LaunchConfiguration launch-config' policies]
   (let [group-config' (group-config group-config')
         launch-config' (launch-config launch-config')
         policies (map scaling-policy policies)]
