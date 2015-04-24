@@ -1,5 +1,7 @@
 (ns nordschleife.convergence
-  (:require [com.palletops.jclouds.compute2 :refer [hostname running? pending?]]))
+  (:require [com.palletops.jclouds.compute2
+             :refer [hostname running? pending?]]
+            [bigml.sampling.simple :refer [sample]]))
 
 (defn ^:private abs
   "Gets the absolute value of a number."
@@ -17,6 +19,14 @@
   [group-name state]
   (let [has-group-name? (fn [node] (.contains (hostname node) group-name))]
     (update state :servers (partial filter has-group-name?))))
+
+(defn pick-victims
+  "Find some servers to kill."
+  [group-name state n]
+  (->> (filter-group group-name state)
+       :servers
+       sample
+       (take n)))
 
 (defn measure-progress
   "Measures progress between states towards the desired state.

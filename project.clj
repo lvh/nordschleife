@@ -29,7 +29,10 @@
                  [com.taoensso/timbre "3.4.0"]
 
                  ;; Math (yay, rounding)
-                 [org.clojure/math.numeric-tower "0.0.4"]]
+                 [org.clojure/math.numeric-tower "0.0.4"]
+
+                 ;; More math (sampling)
+                 [bigml/sampling "3.0"]]
   :plugins [[lein-cljfmt "0.1.10"]
             [lein-marginalia "0.8.0"]
             [lein-ancient "0.6.5"]]
