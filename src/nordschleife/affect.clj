@@ -99,7 +99,10 @@
      :group (-> setup :group-config :name)}))
 
 (defmethod affect :server-failures
-  [services setup event]
+  [services
+   {{name :name} :group-config}
+   {amount :amount}]
+  (t/info "Faking" amount "server failures for group" name)
   {:event event})
 
 (defn ^:private required-policies
