@@ -48,14 +48,14 @@
                         hostname))))
 
 (deftest filter-group-tests
-  (let [create-some (fn [group-name]
-                      (let [base-name (str "server for " group-name)
-                            create-some (fn [status]
-                                          (create-servers 5
-                                                          {:base-name base-name
-                                                           :status status}))]
-                        (mapcat create-some [RUNNING PENDING ERROR])))
-        [xyzzy-servers iddqd-servers] (map create-some ["xyzzy" "iddqd"])
+  (let [create (fn [group-name]
+                 (let [base-name (str "server for " group-name)]
+                   (mapcat (fn [status]
+                             (create-servers 5
+                                             {:base-name base-name
+                                              :status status}))
+                           [RUNNING PENDING ERROR])))
+        [xyzzy-servers iddqd-servers] (map create ["xyzzy" "iddqd"])
         all-servers (concat xyzzy-servers iddqd-servers)]
     (is (= (filter-group "xyzzy" {:servers all-servers})
            {:servers xyzzy-servers}))
