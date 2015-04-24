@@ -55,7 +55,6 @@
   "Apply a step."
   (fn [_ _ event]
     (let [t (:type event)]
-      (t/info "dispatching" t)
       (if (#{:scale-up :scale-down :scale-to} t)
         :scale
         t))))
@@ -145,7 +144,7 @@
         do-step (fn [event]
                   (t/info "Affecting event" event)
                   (affect services setup event))]
-    (map affect evs)))
+    (map do-step evs)))
 
 (defn perform-scenarios
   "Execute multiple scenarios with given parallelism."
