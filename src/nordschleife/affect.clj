@@ -2,9 +2,10 @@
   (:require [clojure.core.async :as a]
             [nordschleife.auto-scale :as as]
             [nordschleife.gathering :refer [gather]]
-            [nordschleife.convergence :refer [measure-progress]]
+            [nordschleife.convergence :as c]
             [taoensso.timbre :as t]
-            [manifold.stream :as s])
+            [manifold.stream :as s]
+            [com.palletops.jclouds.compute2 :refer [destroy-nodes-matching]])
   (:import [org.jclouds.http HttpResponseException]
            [org.jclouds.rest AuthorizationException]
            [java.util.concurrent Executors]
@@ -69,7 +70,7 @@
    {desired :desired-state :as event}]
   (t/info "Acquiescing" name)
   (let [measure (fn [[prev curr]]
-                  (measure-progress prev curr desired))]
+                  (c/measure-progress prev curr desired))]
     (->> state-stream
          (s/stream->seq)
          (take max-tries)
@@ -101,7 +102,7 @@
 (defmethod affect :server-failures
   [services
    {{name :name} :group-config}
-   {amount :amount}]
+   {amount :amount :as event}]
   (t/info "Faking" amount "server failures for group" name)
   {:event event})
 
@@ -125,8 +126,9 @@
 
   Returns the modified scenario, where the setup contains the
   necessary policy ids."
-  [{auto-scale :auto-scale} [setup events]]
+  [{auto-scale :auto-scale} scenario]
   (let [policies (required-policies scenario)
+        [setup events] scenario
         group (as/create-group (as/group-api auto-scale zone)
                                (:group-config setup)
                                (:launch-config setup)
@@ -137,16 +139,29 @@
                                 [[(.getTargetType policy) (.getTarget policy)]
                                  policy]))
                         (into {}))]
-    [(merge setup {:group group :policy-index policy-idx}) events]))
+    [(merge setup {:group group
+                   :policy-index policy-idx})
+     events]))
 
-(defn perform-scenario
-  "Execute a single scenario."
+(defn ^:private clean-up
+  "Cleans up the scaling group and associated resources."
+  [{:keys [state-stream compute auto-scale]}
+   {:keys [group]}]
+  (let [name (as/group-name group)
+        in-this-group? (partial c/has-group-name? name)]
+    (t/info "Cleaning up group" name)
+    (destroy-nodes-matching compute in-this-group?)
+    (as/delete-group auto-scale group)))
+
+(defn ^:private perform-scenario
+  "Execute a single scenario and clean up afterwards."
   [services scenario]
   (let [[setup evs] (prep-scenario services scenario)
-        do-step (fn [event]
-                  (t/info "Affecting event" event)
-                  (affect services setup event))]
-    (map do-step evs)))
+        do-step (partial affect services setup)]
+    (try
+      (into [] (map do-step evs))
+      (finally
+        (clean-up services setup)))))
 
 (defn perform-scenarios
   "Execute multiple scenarios with given parallelism."
