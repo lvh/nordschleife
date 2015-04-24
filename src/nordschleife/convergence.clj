@@ -14,11 +14,16 @@
   (let [live? (some-fn running? pending?)]
     (filter live? (:servers state))))
 
+(defn has-group-name?
+  "Does the node have the scaling group name?"
+  [group-name node]
+  (.contains (hostname node) group-name))
+
 (defn filter-group
   "Filter state items that belong to group with given name."
   [group-name state]
-  (let [has-group-name? (fn [node] (.contains (hostname node) group-name))]
-    (update state :servers (partial filter has-group-name?))))
+  (let [has-this-group-name? (partial has-group-name? group-name)]
+    (update state :servers (partial filter has-this-group-name?))))
 
 (defn pick-victims
   "Find some servers to kill."
