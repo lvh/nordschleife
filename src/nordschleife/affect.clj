@@ -3,13 +3,15 @@
             [nordschleife.auto-scale :as as]
             [nordschleife.gathering :refer [gather]]
             [nordschleife.convergence :refer [measure-progress]]
-            [taoensso.timbre :refer [debug info spy]]
+            [taoensso.timbre :as t]
             [manifold.stream :as s])
   (:import [org.jclouds.http HttpResponseException]
            [org.jclouds.rest AuthorizationException]
-           [java.util.concurrent Executors]))
+           [java.util.concurrent Executors]
+           [java.util Date]))
 
-(def zone "ORD")
+(def zone
+  "ORD")
 
 (def ^:private event-type->target-type
   "Translate the nordschleife event type into the one used by the
@@ -53,6 +55,7 @@
   "Apply a step."
   (fn [_ _ event]
     (let [t (:type event)]
+      (t/info "dispatching" t)
       (if (#{:scale-up :scale-down :scale-to} t)
         :scale
         t))))
@@ -65,7 +68,7 @@
   [{state-stream :state-stream}
    {{name :name} :group-config}
    {desired :desired-state :as event}]
-  (info "Acquiescing" name)
+  (t/info "Acquiescing" name)
   (let [measure (fn [[prev curr]]
                   (measure-progress prev curr desired))]
     (->> state-stream
@@ -78,7 +81,7 @@
 
 (defmethod affect :scale
   [{auto-scale :auto-scale} setup event]
-  (info "Scaling" ((juxt :type :amount) event))
+  (t/info "Scaling" ((juxt :type :amount) event))
   (let [group (:group setup)
         api (as/policy-api auto-scale zone (.getId group))
         key [(event-type->target-type (:type event))
@@ -138,10 +141,10 @@
 (defn perform-scenario
   "Execute a single scenario."
   [services scenario]
-  (info "Performing scenario" scenario)
-  (let [[setup evs] (spy (prep-scenario services scenario))
-        do-step (fn [event] (assoc (affect services setup event)
-                                   :completion-time ))]
+  (let [[setup evs] (prep-scenario services scenario)
+        do-step (fn [event]
+                  (t/info "Affecting event" event)
+                  (affect services setup event))]
     (map affect evs)))
 
 (defn perform-scenarios
@@ -149,10 +152,12 @@
   [services scenarios parallelism]
   (let [state-stream (s/periodically 10000 #(gather services))
         services (assoc services :state-stream state-stream)
-        perform (partial perform-scenario services)
         out (a/chan)]
-    (a/pipeline-blocking parallelism out (map perform) (a/to-chan scenarios))
+    (a/pipeline-blocking parallelism
+                         out
+                         (map (partial perform-scenario services))
+                         (a/to-chan scenarios))
     (let [res (a/<!! (a/into [] out))]
-      (info "Received all outputs, closing state stream")
+      (t/info "Received all outputs, closing state stream")
       (s/close! state-stream)
       res)))
